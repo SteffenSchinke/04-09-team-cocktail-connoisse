@@ -1,25 +1,43 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
 import de.schinke.steffen.interfaces.AppRouteTab
 import de.syntax.institut.projectweek.cocktailconnoisse.R
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
+import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
-object Settings: AppRouteTab, AppRouteContent {
+object Settings : AppRouteTab, AppRouteContent {
 
     override val tabTitle: String
         @Composable
@@ -32,25 +50,77 @@ object Settings: AppRouteTab, AppRouteContent {
         get() = "settings"
 
     override val viewModelDependencies: Map<KClass<out ViewModel>, @Composable (() -> ViewModel)>
-        get() = mapOf()
+        get() = mapOf(
+            SettingsViewModel::class to { koinViewModel<SettingsViewModel>() }
+        )
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
-        get() = { _, _, _, _, _, _ ->
+        get() = { viewModelMap, _, _, _, _, _ ->
 
-            // TODO sts 23.05.25 - hier composable settings ohne Scaffold & Surface
+            if (viewModelMap[SettingsViewModel::class] != null &&
+                viewModelMap.keys.contains(SettingsViewModel::class)
+            ) {
+
+                val viewModel = viewModelMap[SettingsViewModel::class] as SettingsViewModel
+                val isDarkMode = viewModel.isDarkMode.collectAsState().value
+
+                Column(
+
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Top
+                ) {
+
+                    Spacer(Modifier.height(50.dp))
+
+                    Row(
+
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .fillMaxWidth()
+                    ) {
+
+                        Text(
+                            text = stringResource(
+                                if (isDarkMode) R.string.lable_dark_mode_enabled
+                                else R.string.lable_dark_mode_disabled
+                            ),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(Modifier.weight(1f))
+
+                        Switch(
+                            checked = isDarkMode,
+                            onCheckedChange = viewModel::toggleIsDarkMode
+                        )
+                    }
+                }
+            }
         }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override val topBar: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController,
-                                       (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
+    override val topBar: @Composable ((
+        Map<KClass<out ViewModel>, ViewModel>, NavHostController,
+        (AppRouteSheet, Bundle?) -> Unit
+    ) -> Unit)?
         get() = { _, _, _ ->
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(R.string.screen_settings),
-                        style = MaterialTheme.typography.headlineMedium)
-                }
-            )
+
+            Box {
+                CostumTopBarBackground()
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.screen_settings),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent
+                    )
+                )
+            }
         }
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?

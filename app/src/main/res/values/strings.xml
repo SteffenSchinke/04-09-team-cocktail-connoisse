@@ -5,4 +5,7 @@
     <string name="screen_categories">Categories</string>
     <string name="screen_favorites">Favorites</string>">
     <string name="screen_settings">Settings</string>
+    <string name="sheet_filters">Filters</string>
+    <string name="lable_dark_mode_enabled">Dark Mode ausschalten</string>">
+    <string name="lable_dark_mode_disabled">Dark Mode einschalten</string>">
 </resources>
