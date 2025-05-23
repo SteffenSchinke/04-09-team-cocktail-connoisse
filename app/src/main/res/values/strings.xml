@@ -2,5 +2,7 @@
     <string name="app_name">Cocktail Connoisse</string>
 
     <string name="screen_cocktails">Cocktails</string>
+    <string name="screen_categories">Categories</string>
+    <string name="screen_favorites">Favorites</string>">
     <string name="screen_settings">Settings</string>
 </resources>

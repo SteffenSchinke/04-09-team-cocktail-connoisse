@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import de.schinke.steffen.ui.components.DefaultLaunch
 import de.schinke.steffen.ui.helpers.AppLauncher
 import de.schinke.steffen.ui.helpers.AppNavigator
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Categories
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Cocktails
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Favorites
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
 import kotlin.time.Duration.Companion.seconds
@@ -31,8 +33,8 @@ class MainActivity : ComponentActivity() {
 
                     AppNavigator(
                         startScreen = Cocktails,
-                        allRoutes = listOf(Cocktails, Settings),    // bei weiteren screens od sheets muss hier eingefügt werden
-                        allTabRoutes = listOf(Cocktails, Settings)  // bei weiteren tabs muss hier eingefügt werden
+                        allRoutes = listOf(Cocktails, Favorites, Categories, Settings),    // bei weiteren screens od sheets muss hier eingefügt werden
+                        allTabRoutes = listOf(Cocktails, Favorites, Categories, Settings)  // bei weiteren tabs muss hier eingefügt werden
                     )
                 }
             }
