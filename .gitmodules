@@ -1,0 +1,3 @@
+[submodule "kotlin-ui-helpers"]
+	path = kotlin-ui-helpers
+	url = https://github.com/SteffenSchinke/kotlin-ui-helpers.git

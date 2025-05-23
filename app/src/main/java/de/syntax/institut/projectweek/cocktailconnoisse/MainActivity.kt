@@ -4,14 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import de.schinke.steffen.ui.components.DefaultLaunch
+import de.schinke.steffen.ui.helpers.AppLauncher
+import de.schinke.steffen.ui.helpers.AppNavigator
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Cocktails
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
+import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +18,24 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CocktailConnoisseTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+
+                AppLauncher(
+
+                    duration = 3.seconds,
+                    launchContent = {
+
+                        // TODO sts 23.05.25 - hier composable start screen mit oder ohne anime
+                        DefaultLaunch()
+                    }
+                ) {
+
+                    AppNavigator(
+                        startScreen = Cocktails,
+                        allRoutes = listOf(Cocktails, Settings),    // bei weiteren screens od sheets muss hier eingefügt werden
+                        allTabRoutes = listOf(Cocktails, Settings)  // bei weiteren tabs muss hier eingefügt werden
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CocktailConnoisseTheme {
-        Greeting("Android")
     }
 }

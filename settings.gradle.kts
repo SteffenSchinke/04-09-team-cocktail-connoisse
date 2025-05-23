@@ -20,4 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Cocktail Connoisse"
-include(":app")
+include(":app", ":kotlin-ui-helpers")
