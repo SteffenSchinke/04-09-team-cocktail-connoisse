@@ -1,18 +1,14 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocalBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -22,19 +18,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
 import de.schinke.steffen.extensions.sendMessageOnSnackbar
+import de.schinke.steffen.interfaces.AppRoute
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
-import de.schinke.steffen.interfaces.AppRouteTab
+import de.schinke.steffen.ui.components.BackButton
 import de.schinke.steffen.ui.components.CostumAsyncImage
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
@@ -42,53 +44,52 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
-object Cocktails : AppRouteTab, AppRouteContent {
-
-    override val tabTitle: String
-        @Composable
-        get() = stringResource(R.string.screen_cocktails)
-
-    override val tabIcon: @Composable (() -> Unit)
-        get() = { Icon(Icons.Default.LocalBar, null) }
-
+object Details: AppRoute, AppRouteContent {
     override val route: String
-        get() = "cocktails"
+        get() = "details/{id}"
+
+    override val arguments: List<NamedNavArgument> = listOf(
+        navArgument("id") {
+            type = NavType.StringType
+        }
+    )
 
     override val viewModelDependencies: Map<KClass<out ViewModel>, @Composable (() -> ViewModel)>
         get() = mapOf(
-            CocktailsViewModel::class to { koinViewModel<CocktailsViewModel>() }
+            DetailsViewModel::class to { koinViewModel<DetailsViewModel>() }
         )
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
+    override val content: @Composable ((
+        Map<KClass<out ViewModel>, ViewModel>, NavHostController,
+        SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
 
-            if (viewModelMap[CocktailsViewModel::class] != null &&
-                viewModelMap.keys.contains(CocktailsViewModel::class)
+            if (viewModelMap[DetailsViewModel::class] != null &&
+                viewModelMap.keys.contains(DetailsViewModel::class)
             ) {
 
-                val viewModel = viewModelMap[CocktailsViewModel::class] as CocktailsViewModel
+                val viewModel = viewModelMap[DetailsViewModel::class] as DetailsViewModel
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
-                val randomCocktail by viewModel.randomCocktail.collectAsState()
-                val randomCocktails by viewModel.randomCocktails.collectAsState()
+                val cocktail by viewModel.cocktail.collectAsState()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val id = navBackStackEntry?.arguments?.getString("id") ?: ""
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(id) {
 
-                    if (viewModelState == ViewModelState.READY) {
-
-                        viewModel.loadCocktails()
+                    if (viewModelState == ViewModelState.READY && !id.isEmpty()) {
+                        viewModel.loadCocktailById(id)
                     }
                 }
 
-                when (viewModelState) {
-
+                when(viewModelState) {
                     ViewModelState.READY -> {
-                        Content(viewModel, navController, randomCocktail, randomCocktails)
+                        Content(cocktail)
                     }
 
                     ViewModelState.WORKING -> {
@@ -96,6 +97,7 @@ object Cocktails : AppRouteTab, AppRouteContent {
                     }
 
                     ViewModelState.ERROR -> {
+
                         apiError?.let {
                             viewModel.sendMessageOnSnackbar(
                                 message = getStringResourceByName(
@@ -114,69 +116,67 @@ object Cocktails : AppRouteTab, AppRouteContent {
         }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    override val topBar: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
-        get() = { _, _, _ ->
+    override val topBar: @Composable ((
+        Map<KClass<out ViewModel>, ViewModel>, NavHostController,
+        (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
+        get() = { _, navController, _ ->
 
             Box {
                 CostumTopBarBackground()
                 TopAppBar(
                     title = {
                         Text(
-                            text = stringResource(R.string.screen_cocktails),
+                            text = stringResource(R.string.screen_details),
                             style = MaterialTheme.typography.headlineMedium
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent
-                    )
+                    ),
+                    navigationIcon = { BackButton(navController) }
                 )
             }
         }
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
         get() = null
+
+
 }
+
 
 @Composable
 private fun Content(
-    viewModel: CocktailsViewModel,
-    navController: NavHostController,
-    cocktail: Cocktail?,
-    cocktails: List<Cocktail>
+
+    cocktail: Cocktail?
 ) {
 
-    Column {
+    Column (
+        Modifier.fillMaxSize(),
+        Arrangement.Top,
+        Alignment.CenterHorizontally
+    ){
 
         Spacer(Modifier.height(50.dp))
 
         cocktail?.let {
 
-            Text("Cocktail des Tages")
+            Text(
+                text = it.name ?: "Unbekanter Cocktail",
+                style = MaterialTheme.typography.headlineMedium
+            )
 
             CostumAsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
-                    .clickable(onClick = {
-                        navController.navigate(Details.route.replace("{id}", it.id))
-                    }),
-                url = it.imageUrl ?: "")
+                    .height(350.dp),
+                url = it.imageUrl ?: ""
+            )
         }
 
-        Text("Cocktail Liste")
+        // TODO sts 24.05.25 - details & ingredients
 
-        LazyColumn {
 
-            items(cocktails) {
-
-                CostumAsyncImage(
-                    modifier = Modifier
-                        .clickable(onClick = {
-                            navController.navigate(Details.route.replace("{id}", it.id))
-                        }),
-                    url = it.imageUrl ?: "",
-                    size = 120.dp)
-            }
-        }
+        // TODO sts 24.05.25 - list horizontal cocktails from self type
     }
 }

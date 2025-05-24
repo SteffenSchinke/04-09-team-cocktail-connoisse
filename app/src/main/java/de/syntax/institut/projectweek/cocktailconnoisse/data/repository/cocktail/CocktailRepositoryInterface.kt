@@ -8,4 +8,6 @@ interface CocktailRepositoryInterface {
     fun getRandomCocktail(): Flow<Cocktail?>
 
     fun getCocktails(type : String): Flow<List<Cocktail>>
+
+    fun getCocktailById(id: String): Flow<Cocktail?>
 }

@@ -28,6 +28,7 @@ fun CocktailDto.toDomain(): Cocktail {
 
     return Cocktail(
         id = id,
+        name = name,
         category = category,
         instructions = instructions,
         imageUrl = imageUrl,

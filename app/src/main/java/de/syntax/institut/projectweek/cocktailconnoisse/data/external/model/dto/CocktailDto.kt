@@ -7,6 +7,7 @@ import com.squareup.moshi.JsonClass
 data class CocktailDto(
 
     @Json(name = "idDrink") val id: String,
+    @Json(name = "strDrink") val name: String?,
     @Json(name = "strCategory") val category: String?,
     @Json(name = "strInstructionsDE") val instructions: String?,
     @Json(name = "strDrinkThumb") val imageUrl: String?,

@@ -27,11 +27,9 @@ class CocktailRepository(
                 )
             }
 
-            val dtoResponse = response.body()?.cocktails?.firstOrNull()
-                ?: throw ApiError(
-                    type = ApiErrorType.PARSING_FAILED,
-                    innerMessage = "api_error_parse"
-                )
+            val dtoResponse = response.body()?.cocktails?.firstOrNull() ?: throw ApiError(
+                type = ApiErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
+            )
 
             emit(dtoResponse.toDomain())
         } catch (e: ApiError) {
@@ -40,8 +38,7 @@ class CocktailRepository(
         } catch (e: Exception) {
 
             throw ApiError(
-                type = ApiErrorType.RESPONSE_FAILED,
-                innerMessage = e.localizedMessage
+                type = ApiErrorType.RESPONSE_FAILED, innerMessage = e.localizedMessage
             )
         }
     }
@@ -61,11 +58,9 @@ class CocktailRepository(
                 )
             }
 
-            val dtoResponse = response.body()?.cocktails
-                ?: throw ApiError(
-                    type = ApiErrorType.PARSING_FAILED,
-                    innerMessage = "api_error_parse"
-                )
+            val dtoResponse = response.body()?.cocktails ?: throw ApiError(
+                type = ApiErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
+            )
 
             emit(dtoResponse.map { it.toDomain() })
         } catch (e: ApiError) {
@@ -76,6 +71,36 @@ class CocktailRepository(
             throw ApiError(
                 type = ApiErrorType.RESPONSE_FAILED,
                 innerMessage = e.localizedMessage,
+            )
+        }
+    }
+
+    override fun getCocktailById(id: String): Flow<Cocktail?> = flow {
+
+        try {
+
+            val response = api.apiCocktailService.getCocktailById(id)
+
+            if (!response.isSuccessful) {
+                throw ApiError(
+                    type = ApiErrorType.RESPONSE_FAILED,
+                    responseCode = response.code(),
+                    innerMessage = "api_error_response"
+                )
+            }
+
+            val dtoResponse = response.body()?.cocktails?.firstOrNull() ?: throw ApiError(
+                type = ApiErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
+            )
+
+            emit(dtoResponse.toDomain())
+        } catch (e: ApiError) {
+
+            throw e
+        } catch (e: Exception) {
+
+            throw ApiError(
+                type = ApiErrorType.RESPONSE_FAILED, innerMessage = e.localizedMessage
             )
         }
     }

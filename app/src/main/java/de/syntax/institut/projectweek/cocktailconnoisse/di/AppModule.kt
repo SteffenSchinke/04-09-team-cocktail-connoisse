@@ -10,6 +10,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoriteCocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoryViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -48,6 +49,9 @@ val appModule = module {
 
     Log.d("KoinModule", "FavoritesViewModel")
     viewModelOf(::FavoritesViewModel)
+
+    Log.d("KoinModule", "DetailsViewModel")
+    viewModelOf(::DetailsViewModel)
 
     Log.d("KoinModule", "SettingsViewModel")
     viewModelOf(::SettingsViewModel)

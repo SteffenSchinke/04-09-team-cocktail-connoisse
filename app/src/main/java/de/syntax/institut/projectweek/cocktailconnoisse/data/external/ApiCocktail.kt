@@ -15,12 +15,13 @@ class ApiCocktail(
 
     interface ApiCocktailService {
 
-        // TODO sts 23.05.25 - api access change
-
         @GET("random.php")
         suspend fun getRandomCocktail(): Response<ResponseCocktailDto>
 
         @GET("filter.php")
         suspend fun getCocktailsByType(@Query("a") type: String): Response<ResponseCocktailDto>
+
+        @GET("lookup.php")
+        suspend fun getCocktailById(@Query("i") id: String): Response<ResponseCocktailDto>
     }
 }

@@ -12,25 +12,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class CocktailsViewModel(
+class DetailsViewModel(
 
-    application: Application,
     private val cocktailRepository: CocktailRepositoryInterface,
     private val favoriteCocktailRepository: FavoriteCocktailRepositoryInterface,
+    application: Application
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
-    // TODO sts 23.05.25 - implement viewmodel api & database per repository
-
-    private val _randomCocktail = MutableStateFlow<Cocktail?>(null)
-    val randomCocktail: StateFlow<Cocktail?> = _randomCocktail
-
-    private val _randomCocktails = MutableStateFlow<List<Cocktail>>(emptyList())
-    val randomCocktails: StateFlow<List<Cocktail>> = _randomCocktails
+    private val _cocktail = MutableStateFlow<Cocktail?>(null)
+    val cocktail: StateFlow<Cocktail?> = _cocktail
 
     private val _apiError = MutableStateFlow<ApiError?>(null)
     val apiError: StateFlow<ApiError?> = _apiError
 
-    fun loadCocktails() {
+    fun loadCocktailById(id: String) {
 
         if (state.value != ViewModelState.READY) return
 
@@ -39,14 +34,8 @@ class CocktailsViewModel(
         viewModelScope.launch {
 
             try {
-
-                cocktailRepository.getRandomCocktail().collect { cocktail ->
-                    _randomCocktail.value = cocktail
-                }
-
-                // TODO sts 24.05.25 - type in enum class implement and selection in ui
-                cocktailRepository.getCocktails("Alcoholic").collect { cocktails ->
-                     _randomCocktails.value = cocktails
+                cocktailRepository.getCocktailById(id).collect { cocktail ->
+                    _cocktail.value = cocktail
                 }
 
                 setState { ViewModelState.READY }
