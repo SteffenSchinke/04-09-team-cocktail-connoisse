@@ -3,12 +3,11 @@ package de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel
 import android.app.Application
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.cocktail.CocktailRepository
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoriteCocktailRepository
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoriteCocktailRepositoryInterface
 
 class FavoritesViewModel(
 
-    private val favoriteCocktailRepository: FavoriteCocktailRepository,
+    private val favoriteCocktailRepository: FavoriteCocktailRepositoryInterface,
     application: Application
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 

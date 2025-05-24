@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CocktailRepositoryInterface {
 
-    suspend fun getCocktails(): Flow<List<Cocktail>>
+    fun getRandomCocktail(): Flow<Cocktail?>
 
+    fun getCocktails(type : String): Flow<List<Cocktail>>
 }

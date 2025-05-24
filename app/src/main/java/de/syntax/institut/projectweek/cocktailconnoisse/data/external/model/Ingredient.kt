@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.external.model
 
-data class ResponseCocktail(
+data class Ingredient(
 
-    val cocktails: List<Cocktail>
+    val name: String,
+    val measure: String
 )

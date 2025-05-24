@@ -15,6 +15,8 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsVie
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
+private const val API_BASE_URL_COCKTAIL = "https://www.thecocktaildb.com/api/json/v1/1/"
+
 val appModule = module {
 
     Log.d("KoinModule", "start AppModule")
@@ -30,7 +32,7 @@ val appModule = module {
     }
 
     single<ApiCocktail> {
-        ApiCocktail("https://www.thecocktaildb.com/api/json/v1/1/")
+        ApiCocktail(API_BASE_URL_COCKTAIL)
     }
 
     single<CocktailRepositoryInterface> {
@@ -51,4 +53,5 @@ val appModule = module {
     viewModelOf(::SettingsViewModel)
 
     Log.d("KoinModule", "end AppModule")
+
 }
