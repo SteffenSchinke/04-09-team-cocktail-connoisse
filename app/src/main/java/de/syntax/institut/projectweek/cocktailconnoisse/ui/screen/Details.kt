@@ -36,7 +36,7 @@ import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.interfaces.AppRoute
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
-import de.schinke.steffen.ui.components.BackButton
+import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumAsyncImage
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
@@ -48,7 +48,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsView
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
-object Details: AppRoute, AppRouteContent {
+object Details : AppRoute, AppRouteContent {
     override val route: String
         get() = "details/{id}"
 
@@ -66,7 +66,8 @@ object Details: AppRoute, AppRouteContent {
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable ((
         Map<KClass<out ViewModel>, ViewModel>, NavHostController,
-        SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
+        SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit
+    ) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
 
             if (viewModelMap[DetailsViewModel::class] != null &&
@@ -87,7 +88,7 @@ object Details: AppRoute, AppRouteContent {
                     }
                 }
 
-                when(viewModelState) {
+                when (viewModelState) {
                     ViewModelState.READY -> {
                         Content(cocktail)
                     }
@@ -118,7 +119,8 @@ object Details: AppRoute, AppRouteContent {
     @OptIn(ExperimentalMaterial3Api::class)
     override val topBar: @Composable ((
         Map<KClass<out ViewModel>, ViewModel>, NavHostController,
-        (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
+        (AppRouteSheet, Bundle?) -> Unit
+    ) -> Unit)?
         get() = { _, navController, _ ->
 
             Box {
@@ -127,13 +129,19 @@ object Details: AppRoute, AppRouteContent {
                     title = {
                         Text(
                             text = stringResource(R.string.screen_details),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent
                     ),
-                    navigationIcon = { BackButton(navController) }
+                    navigationIcon = {
+                        CostumBackButton(
+                            navController = navController,
+                            tintColor = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 )
             }
         }
@@ -151,11 +159,11 @@ private fun Content(
     cocktail: Cocktail?
 ) {
 
-    Column (
+    Column(
         Modifier.fillMaxSize(),
         Arrangement.Top,
         Alignment.CenterHorizontally
-    ){
+    ) {
 
         Spacer(Modifier.height(50.dp))
 

@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -24,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -123,12 +126,22 @@ object Cocktails : AppRouteTab, AppRouteContent {
                     title = {
                         Text(
                             text = stringResource(R.string.screen_cocktails),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent
-                    )
+                    ),
+                    actions = {
+                        IconButton(
+                            onClick = { /* TODO sts 25.05.25 - search implement */ },
+                            content = { Icon(painterResource(R.drawable.ic_search), null) },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -151,7 +164,7 @@ private fun Content(
 
         cocktail?.let {
 
-            Text("Cocktail des Tages")
+            Text("Cocktail Empfehlung")
 
             CostumAsyncImage(
                 modifier = Modifier
@@ -163,7 +176,7 @@ private fun Content(
                 url = it.imageUrl ?: "")
         }
 
-        Text("Cocktail Liste")
+        Text("Cocktail Vorschläge")
 
         LazyColumn {
 

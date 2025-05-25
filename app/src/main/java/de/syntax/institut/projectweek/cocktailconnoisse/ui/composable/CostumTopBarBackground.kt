@@ -30,7 +30,7 @@ fun CostumTopBarBackground() {
             moveTo(0f, 0f)
             lineTo(0f, height * 0.9f)
             quadraticTo(width / 5f, height * 1.7f,
-                        width, height * 0.8f)
+                        width, height * 0.9f)
             lineTo(width, 0f)
             close()
         }

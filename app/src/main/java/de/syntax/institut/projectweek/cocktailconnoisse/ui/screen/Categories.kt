@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -22,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -51,7 +54,7 @@ object Categories : AppRouteTab, AppRouteContent {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
-        get() = { _, _, _, _, onShowSheet, _ ->
+        get() = { _, _, _, _, _, _ ->
 
             // TODO sts 23.05.25 - sample sheet handling
             Column(
@@ -63,19 +66,12 @@ object Categories : AppRouteTab, AppRouteContent {
 
                 Spacer(Modifier.height(50.dp))
 
-                IconButton(
-                    onClick = {
-                        // sample sheet aufruf ohne argumente
-                        onShowSheet(Filters, null)
-                    },
-                    content = { Icon(Icons.Default.Filter, null) }
-                )
             }
         }
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val topBar: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
-        get() = { _, _, _ ->
+        get() = { _, _, onShowSheet ->
 
             Box {
                 CostumTopBarBackground()
@@ -83,12 +79,23 @@ object Categories : AppRouteTab, AppRouteContent {
                     title = {
                         Text(
                             text = stringResource(R.string.screen_categories),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent
-                    )
+                    ),
+                    actions = {
+                        IconButton(
+                            onClick = { onShowSheet(Filters, null) },
+                            content = { Icon(painterResource(de.schinke.steffen.ui.R.drawable.ic_filte), null) },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
+
                 )
             }
         }

@@ -54,7 +54,8 @@ object Favorites: AppRouteTab, AppRouteContent {
                     title = {
                         Text(
                             text = stringResource(R.string.screen_favorites),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

@@ -113,7 +113,8 @@ object Settings : AppRouteTab, AppRouteContent {
                     title = {
                         Text(
                             text = stringResource(R.string.screen_settings),
-                            style = MaterialTheme.typography.headlineMedium
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

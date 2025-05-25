@@ -20,7 +20,7 @@ class SettingsViewModel(
     application: Application
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
-    // TODO sts 23.05.25 - implement viewmodel preference for user setting
+    // TODO sts 23.05.25 - implement viewmodel preference for user setting local notifications
 
     private val _dataStore = application.dataStore
     private val _scope = viewModelScope
@@ -29,7 +29,7 @@ class SettingsViewModel(
         .map { prefs -> prefs[DATASTORE_IS_DARK_MODE] == true }
         .stateIn(
             scope = _scope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(),
             initialValue = false
         )
 

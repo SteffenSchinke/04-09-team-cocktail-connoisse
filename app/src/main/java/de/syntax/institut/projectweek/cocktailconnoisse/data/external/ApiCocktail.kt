@@ -23,5 +23,8 @@ class ApiCocktail(
 
         @GET("lookup.php")
         suspend fun getCocktailById(@Query("i") id: String): Response<ResponseCocktailDto>
+
+        @GET("search.php")
+        suspend fun getCocktailByName(@Query("s") name: String): Response<ResponseCocktailDto>
     }
 }
