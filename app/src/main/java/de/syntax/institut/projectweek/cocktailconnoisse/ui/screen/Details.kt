@@ -1,10 +1,8 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -158,13 +155,7 @@ private fun Content(
     cocktail: Cocktail?
 ) {
 
-    Column(
-        Modifier.fillMaxSize(),
-        Arrangement.Top,
-        Alignment.CenterHorizontally
-    ) {
-
-        Spacer(Modifier.height(50.dp))
+    Column(Modifier.fillMaxSize()) {
 
         cocktail?.let {
 
@@ -181,8 +172,7 @@ private fun Content(
             )
         }
 
-        // TODO sts 24.05.25 - details & ingredients
-
+        // TODO sts 25.05.25 content implement
 
         // TODO sts 24.05.25 - list horizontal cocktails from self type
     }

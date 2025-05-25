@@ -8,6 +8,14 @@
     <string name="screen_details">Details</string>
     <string name="sheet_filters">Filters</string>
 
+    <string name="lable_display">Anzeige</string>">
+    <string name="lable_notifications">Benachrichtigungen</string>">
+    <string name="lable_notification_error_on">Fehler ausschalten</string>">
+    <string name="lable_notification_error_off">Fehler einschalten</string>">
+    <string name="lable_notification_tip_on">Hinweise ausschalten</string>">
+    <string name="lable_notification_tip_off">Hinweise einschalten</string>">
+    <string name="lable_notification_info_on">Informationen ausschalten</string>">
+    <string name="lable_notification_info_off">Informationen einschalten</string>">
     <string name="lable_dark_mode_enabled">Dark Mode ausschalten</string>">
     <string name="lable_dark_mode_disabled">Dark Mode einschalten</string>">
     <string name="lable_with_alcohol">Mit Alkohol</string>">

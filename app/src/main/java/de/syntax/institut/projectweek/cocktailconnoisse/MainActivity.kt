@@ -6,10 +6,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.magnifier
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -25,6 +29,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.nio.file.WatchEvent
 import kotlin.time.Duration.Companion.seconds
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app.cocktails")
@@ -67,6 +72,7 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     AppNavigator(
+                        modifier = Modifier.padding(top = 70.dp),
                         startScreen = Cocktails,
                         allRoutes =
                             listOf(
@@ -83,7 +89,7 @@ class MainActivity : ComponentActivity() {
                                 Favorites,
                                 Categories,
                                 Settings
-                            )  // bei weiteren tabs muss hier eingefügt werden
+                            ) // bei weiteren tabs muss hier eingefügt werden
                     )
                 }
             }

@@ -43,7 +43,6 @@ class CocktailRepository(
         }
     }
 
-    // TODO sts 24.05.25 - type in enum class implement
     override fun getCocktails(type: String): Flow<List<Cocktail>> = flow {
 
         try {

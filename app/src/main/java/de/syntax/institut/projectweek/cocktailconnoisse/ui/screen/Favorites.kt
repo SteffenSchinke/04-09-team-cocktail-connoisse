@@ -50,6 +50,7 @@ object Favorites : AppRouteTab, AppRouteContent {
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { _, _, _, _, _, _ ->
 
+            // TODO sts 25.05.25 content implement
         }
 
     @OptIn(ExperimentalMaterial3Api::class)

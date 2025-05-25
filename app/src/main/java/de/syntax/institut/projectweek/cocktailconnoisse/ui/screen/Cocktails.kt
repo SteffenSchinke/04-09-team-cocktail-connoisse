@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -172,13 +173,14 @@ private fun Content(
     cocktails: List<Cocktail>
 ) {
 
-    Column {
-
-        Spacer(Modifier.height(50.dp))
+    Column(Modifier.fillMaxSize()) {
 
         cocktail?.let {
 
-            Text("Cocktail Empfehlung")
+            Text(
+                text = "Cocktail Empfehlung",
+                style = MaterialTheme.typography.headlineSmall
+            )
 
             CostumAsyncImage(
                 modifier = Modifier
@@ -191,7 +193,10 @@ private fun Content(
             )
         }
 
-        Text("Cocktail Vorschläge")
+        Text(
+            text = "Cocktail Vorschläge",
+            style = MaterialTheme.typography.headlineSmall
+        )
 
         LazyColumn {
 
