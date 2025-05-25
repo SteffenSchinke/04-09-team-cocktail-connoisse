@@ -5,18 +5,18 @@ import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.cocktail.CocktailRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoritedCocktailRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
 
-    private val cocktailRepository: CocktailRepositoryInterface,
-    private val favoritedCocktailRepository: FavoritedCocktailRepositoryInterface,
-    application: Application
+    application: Application,
+    private val cocktailApi: CocktailApiRepositoryInterface,
+    private val cocktailDb: CocktailDBRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     private val _cocktail = MutableStateFlow<Cocktail?>(null)
@@ -24,6 +24,9 @@ class DetailsViewModel(
 
     private val _apiError = MutableStateFlow<ApiError?>(null)
     val apiError: StateFlow<ApiError?> = _apiError
+
+    private val _isFavorited = MutableStateFlow(false)
+    val isFavorited: StateFlow<Boolean> = _isFavorited
 
     fun loadCocktailById(id: String) {
 
@@ -34,7 +37,7 @@ class DetailsViewModel(
         viewModelScope.launch {
 
             try {
-                cocktailRepository.getCocktailById(id).collect { cocktail ->
+                cocktailApi.getCocktailById(id).collect { cocktail ->
                     _cocktail.value = cocktail
                 }
 
@@ -46,6 +49,22 @@ class DetailsViewModel(
             }
         }
     }
+
+    fun updateIsFavorited() {
+
+        _isFavorited.value = !_isFavorited.value
+
+        _cocktail.value?.let {
+            viewModelScope.launch {
+                if (_isFavorited.value) {
+                    cocktailDb.insertFavoritedCocktail(it)
+                } else {
+                    cocktailDb.deleteFavoritedCocktail(it)
+                }
+            }
+        }
+    }
+
 
     fun resetApiError() { _apiError.value = null }
 }

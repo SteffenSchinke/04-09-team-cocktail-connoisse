@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.cocktail.CocktailRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoritedCocktailRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class CocktailsViewModel(
 
     application: Application,
-    private val cocktailRepository: CocktailRepositoryInterface,
-    private val favoritedCocktailRepository: FavoritedCocktailRepositoryInterface,
+    private val cocktailApi: CocktailApiRepositoryInterface,
+    private val cocktailDb: CocktailDBRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails
@@ -44,11 +44,11 @@ class CocktailsViewModel(
 
             try {
 
-                cocktailRepository.getRandomCocktail().collect { cocktail ->
+                cocktailApi.getRandomCocktail().collect { cocktail ->
                     _randomCocktail.value = cocktail
                 }
 
-                cocktailRepository.getCocktails(
+                cocktailApi.getCocktailsByType(
                     if (withAlcoholic.value) CocktailType.ALCOHOLIC.label
                     else CocktailType.NON_ALCOHOLIC.label
                 ).collect { cocktails ->

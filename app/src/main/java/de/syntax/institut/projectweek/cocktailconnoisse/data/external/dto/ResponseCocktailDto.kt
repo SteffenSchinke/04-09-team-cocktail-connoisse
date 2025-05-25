@@ -1,4 +1,4 @@
-package de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.dto
+package de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass

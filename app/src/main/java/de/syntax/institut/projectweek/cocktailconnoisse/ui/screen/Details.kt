@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
@@ -19,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -39,7 +42,7 @@ import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
@@ -87,7 +90,7 @@ object Details : AppRoute, AppRouteContent {
 
                 when (viewModelState) {
                     ViewModelState.READY -> {
-                        Content(cocktail)
+                        Content(viewModel, cocktail)
                     }
 
                     ViewModelState.WORKING -> {
@@ -153,14 +156,18 @@ object Details : AppRoute, AppRouteContent {
 @Composable
 private fun Content(
 
+
+    viewModel: DetailsViewModel,
     cocktail: Cocktail?
 ) {
+
+    val isFavorited by viewModel.isFavorited.collectAsState()
 
     Column(Modifier.fillMaxSize()) {
 
         cocktail?.let {
 
-            Log.d("Details", "Content: $cocktail")
+            Log.d("Details", "Content: $it")
 
             Text(
                 text = it.name ?: "Unbekanter Cocktail",
@@ -172,6 +179,16 @@ private fun Content(
                     .fillMaxWidth()
                     .height(350.dp),
                 url = it.imageUrl ?: ""
+            )
+
+            IconButton(
+                onClick = viewModel::updateIsFavorited,
+                content = {
+                    if (isFavorited)
+                        Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                    else
+                        Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                }
             )
         }
 

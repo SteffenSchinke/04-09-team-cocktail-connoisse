@@ -43,7 +43,7 @@ import de.schinke.steffen.ui.components.CostumAsyncImage
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
@@ -190,7 +190,7 @@ private fun Content(
                     .fillMaxWidth()
                     .height(250.dp)
                     .clickable(onClick = {
-                        navController.navigate(Details.route.replace("{id}", it.id))
+                        navController.navigate(Details.route.replace("{id}", it.id.toString()))
                     }),
                 url = it.imageUrl ?: ""
             )
@@ -210,7 +210,7 @@ private fun Content(
                 CostumAsyncImage(
                     modifier = Modifier
                         .clickable(onClick = {
-                            navController.navigate(Details.route.replace("{id}", it.id))
+                            navController.navigate(Details.route.replace("{id}", it.id.toString()))
                         }),
                     url = it.imageUrl ?: "",
                     size = 120.dp

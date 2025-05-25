@@ -1,7 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.external
 
 import de.schinke.steffen.base_classs.AppBaseClassApi
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.dto.ResponseCocktailDto
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.ResponseCocktailDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -25,6 +25,6 @@ class ApiCocktail(
         suspend fun getCocktailById(@Query("i") id: String): Response<ResponseCocktailDto>
 
         @GET("search.php")
-        suspend fun getCocktailByName(@Query("s") name: String): Response<ResponseCocktailDto>
+        suspend fun getCocktailsByName(@Query("s") name: String): Response<ResponseCocktailDto>
     }
 }
