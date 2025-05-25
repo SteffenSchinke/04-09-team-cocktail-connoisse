@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -177,6 +178,8 @@ private fun Content(
 
         cocktail?.let {
 
+            Log.d("Cocktails", "Cocktail: $cocktail")
+
             Text(
                 text = "Cocktail Empfehlung",
                 style = MaterialTheme.typography.headlineSmall
@@ -201,6 +204,8 @@ private fun Content(
         LazyColumn {
 
             items(cocktails) {
+
+                Log.d("Cocktails", "Cocktail item: $it")
 
                 CostumAsyncImage(
                     modifier = Modifier

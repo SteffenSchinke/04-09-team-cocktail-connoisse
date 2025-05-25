@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -159,6 +160,8 @@ private fun Content(
 
         cocktail?.let {
 
+            Log.d("Details", "Content: $cocktail")
+
             Text(
                 text = it.name ?: "Unbekanter Cocktail",
                 style = MaterialTheme.typography.headlineMedium
@@ -171,6 +174,7 @@ private fun Content(
                 url = it.imageUrl ?: ""
             )
         }
+
 
         // TODO sts 25.05.25 content implement
 
