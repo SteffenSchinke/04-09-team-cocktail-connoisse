@@ -7,7 +7,7 @@ import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.cocktail.CocktailRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoriteCocktailRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoritedCocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +17,7 @@ class CocktailsViewModel(
 
     application: Application,
     private val cocktailRepository: CocktailRepositoryInterface,
-    private val favoriteCocktailRepository: FavoriteCocktailRepositoryInterface,
+    private val favoritedCocktailRepository: FavoritedCocktailRepositoryInterface,
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails

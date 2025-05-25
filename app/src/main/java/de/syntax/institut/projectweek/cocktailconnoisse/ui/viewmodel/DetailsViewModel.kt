@@ -7,7 +7,7 @@ import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.cocktail.CocktailRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoriteCocktailRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoritedCocktailRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class DetailsViewModel(
 
     private val cocktailRepository: CocktailRepositoryInterface,
-    private val favoriteCocktailRepository: FavoriteCocktailRepositoryInterface,
+    private val favoritedCocktailRepository: FavoritedCocktailRepositoryInterface,
     application: Application
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 

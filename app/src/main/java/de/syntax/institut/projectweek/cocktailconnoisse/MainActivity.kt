@@ -30,7 +30,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsVie
 import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration.Companion.seconds
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app.cocktails")
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app.cocktails.settings")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

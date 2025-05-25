@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 
 
 
-@Entity(tableName = "favorite_cocktail")
-data class FavoriteCocktail(
+@Entity(tableName = "favorited_cocktail")
+data class FavoritedCocktail(
 
     @PrimaryKey(autoGenerate = false)
     val id: String
