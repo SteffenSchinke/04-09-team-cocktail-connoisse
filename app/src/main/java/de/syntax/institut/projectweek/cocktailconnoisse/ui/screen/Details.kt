@@ -36,8 +36,8 @@ import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.interfaces.AppRoute
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
-import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumAsyncImage
+import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
@@ -70,11 +70,10 @@ object Details : AppRoute, AppRouteContent {
     ) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
 
-            if (viewModelMap[DetailsViewModel::class] != null &&
-                viewModelMap.keys.contains(DetailsViewModel::class)
-            ) {
+            val viewModel =
+                viewModelMap.getOrDefault(DetailsViewModel::class, null) as DetailsViewModel?
+            viewModel?.let { viewModel ->
 
-                val viewModel = viewModelMap[DetailsViewModel::class] as DetailsViewModel
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
                 val cocktail by viewModel.cocktail.collectAsState()

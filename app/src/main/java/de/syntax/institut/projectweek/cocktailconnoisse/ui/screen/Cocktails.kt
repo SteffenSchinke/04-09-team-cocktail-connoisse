@@ -7,16 +7,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -70,11 +69,10 @@ object Cocktails : AppRouteTab, AppRouteContent {
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
 
-            if (viewModelMap[CocktailsViewModel::class] != null &&
-                viewModelMap.keys.contains(CocktailsViewModel::class)
-            ) {
+            val viewModel =
+                viewModelMap.getOrDefault(CocktailsViewModel::class, null) as CocktailsViewModel?
+            viewModel?.let { viewModel ->
 
-                val viewModel = viewModelMap[CocktailsViewModel::class] as CocktailsViewModel
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
                 val randomCocktail by viewModel.randomCocktail.collectAsState()
@@ -118,31 +116,47 @@ object Cocktails : AppRouteTab, AppRouteContent {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val topBar: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
-        get() = { _, _, _ ->
+        get() = { viewModelMap, _, _ ->
 
-            Box {
-                CostumTopBarBackground()
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.screen_cocktails),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent
-                    ),
-                    actions = {
-                        IconButton(
-                            onClick = { /* TODO sts 25.05.25 - search implement */ },
-                            content = { Icon(painterResource(R.drawable.ic_search), null) },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.onPrimary
+            val viewModel =
+                viewModelMap.getOrDefault(CocktailsViewModel::class, null) as CocktailsViewModel?
+            viewModel?.let { viewModel ->
+
+                val withAlcoholic by viewModel.withAlcoholic.collectAsState()
+
+                Box {
+                    CostumTopBarBackground()
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = stringResource(R.string.screen_cocktails),
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
-                        )
-                    }
-                )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent
+                        ),
+                        actions = {
+
+                            Text(
+                                text = if (withAlcoholic) {
+                                    stringResource(R.string.lable_with_alcohol)
+                                } else {
+                                    stringResource(R.string.lable_without_alcohol)
+
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            Switch(
+                                checked = withAlcoholic,
+                                onCheckedChange = viewModel::setCocktailType
+                            )
+                        }
+                    )
+                }
             }
         }
 
@@ -173,7 +187,8 @@ private fun Content(
                     .clickable(onClick = {
                         navController.navigate(Details.route.replace("{id}", it.id))
                     }),
-                url = it.imageUrl ?: "")
+                url = it.imageUrl ?: ""
+            )
         }
 
         Text("Cocktail Vorschläge")
@@ -188,7 +203,8 @@ private fun Content(
                             navController.navigate(Details.route.replace("{id}", it.id))
                         }),
                     url = it.imageUrl ?: "",
-                    size = 120.dp)
+                    size = 120.dp
+                )
             }
         }
     }

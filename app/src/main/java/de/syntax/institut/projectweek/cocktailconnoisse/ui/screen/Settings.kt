@@ -58,11 +58,10 @@ object Settings : AppRouteTab, AppRouteContent {
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, _, _, _, _, _ ->
 
-            if (viewModelMap[SettingsViewModel::class] != null &&
-                viewModelMap.keys.contains(SettingsViewModel::class)
-            ) {
+            val viewModel =
+                viewModelMap.getOrDefault(SettingsViewModel::class, null) as SettingsViewModel?
+            viewModel?.let { viewModel ->
 
-                val viewModel = viewModelMap[SettingsViewModel::class] as SettingsViewModel
                 val isDarkMode = viewModel.isDarkMode.collectAsState().value
 
                 Column(

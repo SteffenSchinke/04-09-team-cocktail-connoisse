@@ -8,6 +8,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.cocktail.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.favorite.FavoriteCocktailRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,16 +20,19 @@ class CocktailsViewModel(
     private val favoriteCocktailRepository: FavoriteCocktailRepositoryInterface,
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
-    // TODO sts 23.05.25 - implement viewmodel api & database per repository
+    // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails
+
+    private val _apiError = MutableStateFlow<ApiError?>(null)
+    val apiError: StateFlow<ApiError?> = _apiError
+
+    private val _withAlcoholic = MutableStateFlow(true)
+    val withAlcoholic: StateFlow<Boolean> = _withAlcoholic
 
     private val _randomCocktail = MutableStateFlow<Cocktail?>(null)
     val randomCocktail: StateFlow<Cocktail?> = _randomCocktail
 
     private val _randomCocktails = MutableStateFlow<List<Cocktail>>(emptyList())
     val randomCocktails: StateFlow<List<Cocktail>> = _randomCocktails
-
-    private val _apiError = MutableStateFlow<ApiError?>(null)
-    val apiError: StateFlow<ApiError?> = _apiError
 
     fun loadCocktails() {
 
@@ -44,9 +48,11 @@ class CocktailsViewModel(
                     _randomCocktail.value = cocktail
                 }
 
-                // TODO sts 24.05.25 - type in enum class implement and selection in ui
-                cocktailRepository.getCocktails("Alcoholic").collect { cocktails ->
-                     _randomCocktails.value = cocktails
+                cocktailRepository.getCocktails(
+                    if (withAlcoholic.value) CocktailType.ALCOHOLIC.label
+                    else CocktailType.NON_ALCOHOLIC.label
+                ).collect { cocktails ->
+                    _randomCocktails.value = cocktails
                 }
 
                 setState { ViewModelState.READY }
@@ -58,5 +64,13 @@ class CocktailsViewModel(
         }
     }
 
-    fun resetApiError() { _apiError.value = null }
+    fun setCocktailType(newValue: Boolean) {
+
+        _withAlcoholic.value = newValue
+        loadCocktails()
+    }
+
+    fun resetApiError() {
+        _apiError.value = null
+    }
 }

@@ -87,19 +87,22 @@ object Categories : AppRouteTab, AppRouteContent {
                     actions = {
                         IconButton(
                             onClick = { onShowSheet(Filters, null) },
-                            content = { Icon(painterResource(de.schinke.steffen.ui.R.drawable.ic_filte), null) },
+                            content = {
+                                Icon(
+                                    painterResource(de.schinke.steffen.ui.R.drawable.ic_filte),
+                                    null
+                                )
+                            },
                             colors = IconButtonDefaults.iconButtonColors(
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             )
                         )
                     }
-
                 )
             }
         }
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
         get() = null
-
 
 }

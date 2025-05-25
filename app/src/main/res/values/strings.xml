@@ -7,8 +7,12 @@
     <string name="screen_settings">Settings</string>
     <string name="screen_details">Details</string>
     <string name="sheet_filters">Filters</string>
+
     <string name="lable_dark_mode_enabled">Dark Mode ausschalten</string>">
     <string name="lable_dark_mode_disabled">Dark Mode einschalten</string>">
+    <string name="lable_with_alcohol">Mit Alkohol</string>">
+    <string name="lable_without_alcohol">Ohne Alkohol</string>">
+
     <string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
     <string name="api_error_response">Die API antwortet mit einem Fehler.</string>
     <string name="api_error_unknown">Unbekannter API Fehler.</string>
