@@ -1,4 +1,4 @@
-package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
+package de.syntax.institut.projectweek.cocktailconnoisse.ui.composable
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +10,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 
 @Composable
 fun Launch() {
+
     Image(
         painter = painterResource(R.drawable.coktails),
         contentDescription = "Logo",

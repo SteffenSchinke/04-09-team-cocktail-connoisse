@@ -23,7 +23,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Cocktails
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Details
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Favorites
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Home
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Launch
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.Launch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
