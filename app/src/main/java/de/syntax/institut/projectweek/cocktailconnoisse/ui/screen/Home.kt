@@ -103,7 +103,7 @@ object Home : AppRouteTab, AppRouteContent {
                     ViewModelState.READY -> {
 
                         cocktail?.let { cocktail ->
-                            Content(navController, viewModelHome, cocktail, cocktails)
+                            Content(navController, cocktail, cocktails)
                         }
                     }
 
@@ -180,7 +180,6 @@ object Home : AppRouteTab, AppRouteContent {
     internal fun Content(
 
         navController: NavHostController,
-        viewModel: HomeViewModel,
         cocktail: Cocktail,
         cocktails: List<Cocktail>
     ) {
@@ -191,7 +190,7 @@ object Home : AppRouteTab, AppRouteContent {
 
             Spacer(Modifier.height(20.dp))
 
-            CocktailList(cocktails, navController, viewModel)
+            CocktailList(cocktails, navController)
         }
     }
 
@@ -244,7 +243,7 @@ object Home : AppRouteTab, AppRouteContent {
     }
 
     @Composable
-    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController, viewModel: HomeViewModel) {
+    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController) {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -257,9 +256,13 @@ object Home : AppRouteTab, AppRouteContent {
             )
 
             TextButton(
-                onClick = { navController.navigate(
-                    Suggestions.route.replace("{cocktail_type}",
-                        viewModel.cocktailType.value.label))  },
+                onClick = {
+
+                    val route = Cocktails.route
+                        .replace("{ids}", cocktails.joinToString(",") { it.id.toString() })
+                        .replace("{top_bar_title}", "sheet_suggestions")
+                    navController.navigate(route)
+                },
                 content = { Text(stringResource(R.string.lable_home_title3)) }
             )
         }
