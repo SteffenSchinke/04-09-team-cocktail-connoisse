@@ -167,7 +167,7 @@ object Details : AppRoute, AppRouteContent {
                 Log.d("Details", "Content: $it")
 
                 Text(
-                    text = it.name ?: "Unbekanter Cocktail",
+                    text = it.name,
                     style = MaterialTheme.typography.headlineMedium
                 )
 
@@ -175,7 +175,7 @@ object Details : AppRoute, AppRouteContent {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(350.dp),
-                    url = it.imageUrl ?: ""
+                    url = it.imageUrl
                 )
 
                 IconButton(
