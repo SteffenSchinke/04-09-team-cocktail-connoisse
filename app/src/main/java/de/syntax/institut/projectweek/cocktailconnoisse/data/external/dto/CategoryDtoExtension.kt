@@ -11,17 +11,17 @@ fun CategoryDto.toDomain(): Category {
         name = name,
         imageId =
             when (name) {
-                "Cocktail" -> R.drawable.ic_launcher_background
-                "Ordinary Drink" -> R.drawable.ic_launcher_background
-                "Punch / Party Drink" -> R.drawable.ic_launcher_background
-                "Shake" -> R.drawable.ic_launcher_background
-                "Other / Unknown" -> R.drawable.ic_launcher_background
-                "Cocoa" -> R.drawable.ic_launcher_background
+                "Cocktail" -> R.drawable.category_cocktail
+                "Ordinary Drink" -> R.drawable.category_ordinary_drink
+                "Punch / Party Drink" -> R.drawable.category_punch_patry_drink
+                "Shake" -> R.drawable.category_shake
+                "Other / Unknown" -> R.drawable.category_other_unknown
+                "Cocoa" -> R.drawable.category_cocoa
                 "Shot" -> R.drawable.ic_launcher_background
-                "Coffee / Tea" -> R.drawable.ic_launcher_background
-                "Homemade Liqueur" -> R.drawable.ic_launcher_background
-                "Beer" -> R.drawable.ic_launcher_background
-                "Soft Drink" -> R.drawable.ic_launcher_background
+                "Coffee / Tea" -> R.drawable.category_coffee_tea
+                "Homemade Liqueur" -> R.drawable.category_homemade_liqueur
+                "Beer" -> R.drawable.category_beer
+                "Soft Drink" -> R.drawable.category_soft_drink
                 else -> throw ApiError(
                     type = ApiErrorType.CATEGORY_FAILED,
                     responseCode = null,
