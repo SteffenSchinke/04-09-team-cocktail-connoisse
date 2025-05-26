@@ -21,8 +21,8 @@
     <string name="lable_dark_mode_disabled">Dark Mode einschalten</string>">
     <string name="lable_with_alcohol">Mit Alkohol</string>">
     <string name="lable_without_alcohol">Ohne Alkohol</string>">
-    <string name="lable_cocktail_title1">Cocktail Empfehlung</string>">
-    <string name="lable_cocktail_title2">Cocktail Vorschläge</string>">
+    <string name="lable_cocktail_title1">Empfehlung</string>">
+    <string name="lable_cocktail_title2">Vorschläge</string>">
 
     <string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
     <string name="api_error_response">Die API antwortet mit einem Fehler.</string>
