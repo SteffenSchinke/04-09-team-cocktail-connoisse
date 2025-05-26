@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -165,57 +164,62 @@ object Home : AppRouteTab, AppRouteContent {
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
         get() = null
-}
 
-@Composable
-private fun Content(
-    viewModel: HomeViewModel,
-    navController: NavHostController,
-    cocktail: Cocktail?,
-    cocktails: List<Cocktail>
-) {
+    @Composable
+    private fun Content(
+        viewModel: HomeViewModel,
+        navController: NavHostController,
+        cocktail: Cocktail?,
+        cocktails: List<Cocktail>
+    ) {
 
-    Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize()) {
 
-        cocktail?.let {
+            cocktail?.let {
 
-            Log.d("Cocktails", "Cocktail: $cocktail")
+                Log.d("Cocktails", "Cocktail: $cocktail")
 
-            Text(
-                text = stringResource(R.string.lable_cocktail_title1),
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            CostumAsyncImage(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp)
-                    .clickable(onClick = {
-                        navController.navigate(Details.route.replace("{id}", it.id.toString()))
-                    }),
-                url = it.imageUrl ?: ""
-            )
-        }
-
-        Text(
-            text = stringResource(R.string.lable_cocktail_title2),
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        LazyColumn {
-
-            items(cocktails) {
-
-                Log.d("Cocktails", "Cocktail item: $it")
+                Text(
+                    text = stringResource(R.string.lable_cocktail_title1),
+                    style = MaterialTheme.typography.headlineSmall
+                )
 
                 CostumAsyncImage(
                     modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
                         .clickable(onClick = {
                             navController.navigate(Details.route.replace("{id}", it.id.toString()))
                         }),
-                    url = it.imageUrl ?: "",
-                    size = 120.dp
+                    url = it.imageUrl ?: ""
                 )
+            }
+
+            Text(
+                text = stringResource(R.string.lable_cocktail_title2),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            LazyColumn {
+
+                items(cocktails) {
+
+                    Log.d("Cocktails", "Cocktail item: $it")
+
+                    CostumAsyncImage(
+                        modifier = Modifier
+                            .clickable(onClick = {
+                                navController.navigate(
+                                    Details.route.replace(
+                                        "{id}",
+                                        it.id.toString()
+                                    )
+                                )
+                            }),
+                        url = it.imageUrl ?: "",
+                        size = 120.dp
+                    )
+                }
             }
         }
     }

@@ -8,7 +8,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoryViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoriesViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
@@ -45,7 +45,7 @@ val appModule = module {
     viewModelOf(::HomeViewModel)
 
     Log.d("KoinModule", "CategoryViewModel")
-    viewModelOf(::CategoryViewModel)
+    viewModelOf(::CategoriesViewModel)
 
     Log.d("KoinModule", "FavoritesViewModel")
     viewModelOf(::FavoritesViewModel)
