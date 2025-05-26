@@ -4,6 +4,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktai
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiErrorType
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.toDomain
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -134,4 +135,36 @@ class CocktailApiRepository(
             )
         }
     }
+
+    override fun getAllCategories(): Flow<List<Category>> = flow {
+
+        try {
+
+            val response = api.apiCocktailService.getAllCategories()
+
+            if (!response.isSuccessful) {
+                throw ApiError(
+                    type = ApiErrorType.RESPONSE_FAILED,
+                    responseCode = response.code(),
+                    innerMessage = "api_error_response"
+                )
+            }
+
+            val dtoResponse = response.body()?.category ?: throw ApiError(
+                type = ApiErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
+            )
+
+            emit(dtoResponse.map { it.toDomain() })
+        } catch (e: ApiError) {
+
+            throw e
+        } catch (e: Exception) {
+
+            throw ApiError(
+                type = ApiErrorType.RESPONSE_FAILED,
+                innerMessage = e.localizedMessage,
+            )
+        }
+    }
+
 }

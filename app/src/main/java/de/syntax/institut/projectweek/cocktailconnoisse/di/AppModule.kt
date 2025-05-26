@@ -9,7 +9,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoryViewModel
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
@@ -41,8 +41,8 @@ val appModule = module {
         CocktailApiRepository(get())
     }
 
-    Log.d("KoinModule", "CocktailsViewModel")
-    viewModelOf(::CocktailsViewModel)
+    Log.d("KoinModule", "HomeViewModel")
+    viewModelOf(::HomeViewModel)
 
     Log.d("KoinModule", "CategoryViewModel")
     viewModelOf(::CategoryViewModel)

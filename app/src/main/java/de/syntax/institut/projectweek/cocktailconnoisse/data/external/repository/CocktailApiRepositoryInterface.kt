@@ -1,5 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository
 
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import kotlinx.coroutines.flow.Flow
 
@@ -12,4 +13,6 @@ interface CocktailApiRepositoryInterface {
     fun getCocktailById(id: String): Flow<Cocktail?>
 
     fun getCocktailsByName(name: String): Flow<List<Cocktail>>
+
+    fun getAllCategories(): Flow<List<Category>>
 }

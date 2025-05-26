@@ -21,6 +21,7 @@ import de.schinke.steffen.ui.helpers.AppLauncher
 import de.schinke.steffen.ui.helpers.AppNavigator
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Categories
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Cocktails
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Home
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Details
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Favorites
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
@@ -71,19 +72,20 @@ class MainActivity : ComponentActivity() {
 
                     AppNavigator(
                         modifier = Modifier.padding(top = 70.dp),
-                        startScreen = Cocktails,
+                        startScreen = Home,
                         allRoutes =
                             listOf(
-                                Cocktails,
+                                Home,
                                 Favorites,
                                 Categories,
                                 Settings,
                                 Details,
-                                Filters
+                                Filters,
+                                Cocktails
                             ),    // bei weiteren screens od sheets muss hier eingefügt werden
                         allTabRoutes =
                             listOf(
-                                Cocktails,
+                                Home,
                                 Favorites,
                                 Categories,
                                 Settings

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Cocktail Connoisse</string>
 
+    <string name="screen_home">Home</string>
     <string name="screen_cocktails">Cocktails</string>
     <string name="screen_categories">Categories</string>
     <string name="screen_favorites">Favorites</string>">
@@ -20,6 +21,8 @@
     <string name="lable_dark_mode_disabled">Dark Mode einschalten</string>">
     <string name="lable_with_alcohol">Mit Alkohol</string>">
     <string name="lable_without_alcohol">Ohne Alkohol</string>">
+    <string name="lable_cocktail_title1">Cocktail Empfehlung</string>">
+    <string name="lable_cocktail_title2">Cocktail Vorschläge</string>">
 
     <string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
     <string name="api_error_response">Die API antwortet mit einem Fehler.</string>
