@@ -9,10 +9,10 @@ data class Cocktail(
 
     @PrimaryKey(autoGenerate = false)
     val id: Long,
-    val name: String?,
-    val category: String?,
+    val name: String,
+    val category: String,
     val instructions: String?,
-    val imageUrl: String?,
+    val imageUrl: String,
     val modifiedAt: String?
 ) {
 

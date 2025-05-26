@@ -1,73 +1,71 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
-import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
 import de.schinke.steffen.extensions.sendMessageOnSnackbar
+import de.schinke.steffen.interfaces.AppRoute
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
-import de.schinke.steffen.interfaces.AppRouteTab
+import de.schinke.steffen.ui.components.CostumAsyncImage
+import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
-import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoriesViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SuggestionsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
-object Categories : AppRouteTab, AppRouteContent {
-
-    override val tabTitle: String
-        @Composable
-        get() = stringResource(R.string.screen_categories)
-
-    override val tabIcon: @Composable (() -> Unit)
-        get() = { Icon(Icons.Default.Category, null) }
+object Suggestions: AppRoute, AppRouteContent {
 
     override val route: String
-        get() = "categories"
+        get() = "suggestions/{cocktail_type}"
+
+    override val arguments: List<NamedNavArgument> = listOf(
+        navArgument("cocktail_type") {
+            type = NavType.StringType
+        }
+    )
 
     override val viewModelDependencies: Map<KClass<out ViewModel>, @Composable (() -> ViewModel)>
         get() = mapOf(
-            CategoriesViewModel::class to { koinViewModel<CategoriesViewModel>() }
+            SuggestionsViewModel::class to { koinViewModel<SuggestionsViewModel>() }
         )
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -75,17 +73,26 @@ object Categories : AppRouteTab, AppRouteContent {
         get() = { viewModelMap, navController, _, _, _, _ ->
 
             val viewModel =
-                viewModelMap.getOrDefault(CategoriesViewModel::class, null) as CategoriesViewModel?
+                viewModelMap.getOrDefault(SuggestionsViewModel::class, null) as SuggestionsViewModel?
             viewModel?.let { viewModel ->
+
 
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
-                val categories by viewModel.categories.collectAsState()
+                val cocktails = viewModel.cocktails.collectAsState().value
+
+                LaunchedEffect(Unit) {
+
+                    if (viewModelState == ViewModelState.READY) {
+
+                        viewModel.loadCocktails()
+                    }
+                }
 
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, categories)
+                        Content(navController, cocktails)
                     }
 
                     ViewModelState.WORKING -> {
@@ -112,14 +119,14 @@ object Categories : AppRouteTab, AppRouteContent {
 
     @OptIn(ExperimentalMaterial3Api::class)
     override val topBar: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
-        get() = { _, _, onShowSheet ->
+        get() = { _, navController, _ ->
 
             Box {
                 CostumTopBarBackground()
                 TopAppBar(
                     title = {
                         Text(
-                            text = stringResource(R.string.screen_categories),
+                            text = stringResource(R.string.sheet_suggestions),
                             style = MaterialTheme.typography.headlineMedium,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -127,18 +134,10 @@ object Categories : AppRouteTab, AppRouteContent {
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent
                     ),
-                    actions = {
-                        IconButton(
-                            onClick = { onShowSheet(Filters, null) },
-                            content = {
-                                Icon(
-                                    painterResource(de.schinke.steffen.ui.R.drawable.ic_filte),
-                                    null
-                                )
-                            },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
+                    navigationIcon = {
+                        CostumBackButton(
+                            navController = navController,
+                            tintColor = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 )
@@ -146,57 +145,60 @@ object Categories : AppRouteTab, AppRouteContent {
         }
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
-        get() = { _, _, _ ->
-
-            CostumShadowBox(
-                modifier = Modifier
-                    .width(56.dp),
-                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                shadowColor = MaterialTheme.colorScheme.secondary,
-                elevation = 6.dp,
-                cornerRadius = 12.dp,
-                borderSize = 0.dp
-            ) {
-                FloatingActionButton(
-                    onClick = {  },
-                    elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(0.dp)
-                ) {
-                    Icon(painterResource(id = R.drawable.ic_filter_list), "Filter")
-                }
-            }
-        }
+        get() = null
 
     @Composable
-    private fun Content(navController: NavHostController, categories: List<Category>) {
+    private fun Content(navController: NavHostController, cocktails: List<Cocktail>) {
 
-        Column(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-            Log.d("Categories", "categories: $categories")
-
-            LazyColumn {
-
-                items(categories) {
-
-
-                    Log.d("Cocktails", "category item: $it")
-                    Column {
-                        Image(
-                            modifier = Modifier
-                                .clickable(onClick = {
-                                    navController.navigate(
-                                        Details.route.replace(
-                                            "{category_type}",
-                                            it.toUrlArgument()
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(cocktails) { cocktailItem ->
+                    Box(
+                        Modifier
+                            .aspectRatio(1f)
+                            .padding(12.dp)
+                    ) {
+                        CostumShadowBox(
+                            elevation = 6.dp,
+                            shadowPositions = setOf(
+                                ShadowPosition.TOP,
+                                ShadowPosition.LEFT
+                            ),
+                            cornerRadius = 12.dp,
+                            shadowColor = MaterialTheme.colorScheme.secondary
+                        ) {
+                            CostumAsyncImage(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable {
+                                        navController.navigate(
+                                            Details.route.replace(
+                                                "{id}",
+                                                cocktailItem.id.toString()
+                                            )
                                         )
-                                    )
-                                }),
-                            painter = painterResource(id = it.imageId),
-                            contentDescription = it.name
-                        )
-
+                                    },
+                                url = cocktailItem.imageUrl
+                            )
+                        }
                         Text(
-                            text = it.name,
-                            style = MaterialTheme.typography.headlineSmall
+                            text = cocktailItem.name,
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleSmall,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
                         )
                     }
                 }

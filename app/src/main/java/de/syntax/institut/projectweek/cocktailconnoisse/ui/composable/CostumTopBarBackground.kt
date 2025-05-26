@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.composable
 
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,12 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
 
 
 @Composable
 fun CostumTopBarBackground() {
 
-    val color = MaterialTheme.colorScheme.primary
+    val color = MaterialTheme.colorScheme.secondary
 
     Canvas(
         modifier = Modifier
@@ -39,8 +41,12 @@ fun CostumTopBarBackground() {
     }
 }
 
-@Preview
+@Preview(showBackground = true, name = "Light")
+@Preview(showBackground = true, name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun CostumTopBarBackgroundPreview() {
-    CostumTopBarBackground()
+
+    CocktailConnoisseTheme {
+        CostumTopBarBackground()
+    }
 }

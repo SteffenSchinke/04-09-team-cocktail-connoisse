@@ -7,6 +7,8 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -25,6 +27,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Favorites
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Home
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.Launch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Suggestions
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
@@ -76,6 +79,7 @@ class MainActivity : ComponentActivity() {
                                 Home,
                                 Favorites,
                                 Categories,
+                                Suggestions,
                                 Settings,
                                 Details,
                                 Filters,
@@ -87,7 +91,17 @@ class MainActivity : ComponentActivity() {
                                 Favorites,
                                 Categories,
                                 Settings
-                            ) // bei weiteren tabs muss hier eingefügt werden
+                            ), // bei weiteren tabs muss hier eingefügt werden
+                        navigationBottomBarColor =
+                            MaterialTheme.colorScheme.secondary,
+                        navgationBottomBarItemColors =
+                            NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.secondary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                indicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
                     )
                 }
             }

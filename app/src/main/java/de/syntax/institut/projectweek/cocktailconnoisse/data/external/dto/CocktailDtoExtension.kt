@@ -32,10 +32,10 @@ fun CocktailDto.toDomain(): Cocktail {
 
     val cocktail = Cocktail(
         id = id.toLong(),
-        name = name,
-        category = category,
+        name = name ?: "Unbekannter Cocktail",
+        category = category ?: "Unbekannter Kategorie",
         instructions = instructions,
-        imageUrl = imageUrl,
+        imageUrl = imageUrl ?: "Unbekannte Url",
         modifiedAt = modifiedAt
     )
     cocktail.ingredients = ingredients

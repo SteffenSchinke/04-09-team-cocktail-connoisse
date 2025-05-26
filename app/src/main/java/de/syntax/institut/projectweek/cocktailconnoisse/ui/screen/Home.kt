@@ -8,18 +8,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -36,9 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -63,7 +54,6 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -91,14 +81,14 @@ object Home : AppRouteTab, AppRouteContent {
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
 
-            val viewModelHome =
+            val viewModel =
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
-            viewModelHome?.let { viewModelHome ->
+            viewModel?.let { viewModelHome ->
 
                 val viewModelState by viewModelHome.state.collectAsState()
                 val apiError by viewModelHome.apiError.collectAsState()
-                val randomCocktail by viewModelHome.randomCocktail.collectAsState()
-                val randomCocktails by viewModelHome.randomCocktails.collectAsState()
+                val cocktail = viewModelHome.randomCocktail.collectAsState().value
+                val cocktails = viewModelHome.randomCocktails.collectAsState().value
 
                 LaunchedEffect(Unit) {
 
@@ -111,7 +101,10 @@ object Home : AppRouteTab, AppRouteContent {
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, randomCocktail, randomCocktails)
+
+                        cocktail?.let { cocktail ->
+                            Content(navController, viewModelHome, cocktail, cocktails)
+                        }
                     }
 
                     ViewModelState.WORKING -> {
@@ -144,8 +137,6 @@ object Home : AppRouteTab, AppRouteContent {
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
             viewModel?.let { viewModel ->
 
-                val withAlcoholic by viewModel.withAlcoholic.collectAsState()
-
                 Box {
                     CostumTopBarBackground()
                     TopAppBar(
@@ -162,7 +153,7 @@ object Home : AppRouteTab, AppRouteContent {
                         actions = {
 
                             Text(
-                                text = if (withAlcoholic) {
+                                text = if (viewModel.withAlcoholic) {
                                     stringResource(R.string.lable_with_alcohol)
                                 } else {
                                     stringResource(R.string.lable_without_alcohol)
@@ -173,7 +164,7 @@ object Home : AppRouteTab, AppRouteContent {
                             )
                             Spacer(Modifier.width(10.dp))
                             Switch(
-                                checked = withAlcoholic,
+                                checked = viewModel.withAlcoholic,
                                 onCheckedChange = viewModel::setCocktailType
                             )
                         }
@@ -184,202 +175,142 @@ object Home : AppRouteTab, AppRouteContent {
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
         get() = null
-}
 
+    @Composable
+    internal fun Content(
 
-@Composable
-private fun Content(
+        navController: NavHostController,
+        viewModel: HomeViewModel,
+        cocktail: Cocktail,
+        cocktails: List<Cocktail>
+    ) {
 
-    navController: NavHostController,
-    cocktail: Cocktail?,
-    cocktails: List<Cocktail>
-) {
-    var showALL by remember { mutableStateOf(false) }
+        Column {
 
-    val viewModel: SettingsViewModel = koinViewModel()
-    val isDarkTheme = viewModel.isDarkMode.collectAsState().value
+            CocktailItem(cocktail, navController)
 
-    if (!showALL) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            Spacer(Modifier.height(20.dp))
+
+            CocktailList(cocktails, navController, viewModel)
+        }
+    }
+
+    @Composable
+    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController) {
+
+        Text(
+            text = stringResource(R.string.lable_home_title1),
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Box(
+            Modifier.fillMaxWidth()
         ) {
-            item {
-                Column {
-                    Text(
-                        text = stringResource(R.string.lable_cocktail_title1),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    Box(
-                        Modifier.fillMaxWidth()
+
+            CostumShadowBox(
+                elevation = 6.dp,
+                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                cornerRadius = 12.dp,
+                shadowColor = MaterialTheme.colorScheme.secondary
+            ) {
+                CostumAsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .clickable {
+                            navController.navigate(
+                                Details.route.replace("{id}", cocktail.id.toString())
+                            )
+                        },
+                    url = cocktail.imageUrl
+                )
+            }
+
+            Text(
+                text = cocktail.name,
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .widthIn(max = 200.dp)
+                    .padding(horizontal = 8.dp)
+            )
+        }
+
+        Spacer(Modifier.height(20.dp))
+    }
+
+    @Composable
+    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController, viewModel: HomeViewModel) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.lable_home_title2),
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            TextButton(
+                onClick = { navController.navigate(
+                    Suggestions.route.replace("{cocktail_type}",
+                        viewModel.cocktailType.value.label))  },
+                content = { Text(stringResource(R.string.lable_home_title3)) }
+            )
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(5.dp)
+        ) {
+            items(cocktails.take(10)) { cocktailItem ->
+
+                Box(
+                    Modifier.fillMaxWidth()
+                ) {
+                    CostumShadowBox(
+                        elevation = 6.dp,
+                        shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                        cornerRadius = 12.dp,
+                        shadowColor = MaterialTheme.colorScheme.secondary
                     ) {
+
                         CostumAsyncImage(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .width(250.dp)
                                 .height(250.dp)
                                 .clickable {
                                     navController.navigate(
-                                        Details.route.replace("{id}", cocktail?.id.toString())
+                                        Details.route.replace(
+                                            "{id}",
+                                            cocktailItem.id.toString()
+                                        )
                                     )
                                 },
-                            url = cocktail?.imageUrl ?: ""
+                            url = cocktailItem.imageUrl
                         )
-
-                        cocktail?.name?.let {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(Alignment.BottomCenter)
-                                    .padding(vertical = 20.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = it,
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    maxLines = 3,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier
-                                        .widthIn(max = 200.dp)
-                                        .padding(horizontal = 8.dp)
-                                )
-                            }
-                        }
                     }
-                }
-            }
 
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     Text(
-                        text = stringResource(R.string.lable_cocktail_title2),
-                        style = MaterialTheme.typography.headlineSmall
+                        text = cocktailItem.name,
+                        color = Color.White,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .widthIn(max = 200.dp)
+                            .padding(horizontal = 8.dp)
                     )
-
-                    TextButton(onClick = { showALL = true }) {
-                        Text("Alle anzeigen")
-                    }
-                }
-            }
-
-            item {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(cocktails.take(10)) { cocktailItem ->
-                        Box(
-                            Modifier.fillMaxWidth()
-                        ) {
-                            CostumAsyncImage(
-                                modifier = Modifier
-                                    .width(250.dp)
-                                    .height(250.dp)
-                                    .clickable {
-                                        navController.navigate(
-                                            Details.route.replace(
-                                                "{id}",
-                                                cocktailItem.id.toString()
-                                            )
-                                        )
-                                    },
-                                url = cocktailItem.imageUrl ?: ""
-                            )
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .align(Alignment.BottomCenter)
-                                    .padding(vertical = 20.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                Text(
-                                    text = cocktailItem.name ?: "",
-                                    color = Color.White,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    maxLines = 3,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier
-                                        .widthIn(max = 200.dp)
-                                        .padding(horizontal = 8.dp)
-                                )
-
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Alle Cocktails",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                TextButton(onClick = { showALL = false }) {
-                    Text("Zurück")
-                }
-            }
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(cocktails) { cocktailItem ->
-                    Box(
-                        Modifier
-                            .aspectRatio(1f)
-                            .padding(12.dp)
-                    ) {
-                        CostumShadowBox(
-                            elevation = 6.dp,
-                            shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                            cornerRadius = 12.dp,
-                            shadowColor = if (isDarkTheme) Color.White else Color.Black
-                        ) {
-                            CostumAsyncImage(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable {
-                                        navController.navigate(
-                                            Details.route.replace(
-                                                "{id}",
-                                                cocktailItem.id.toString()
-                                            )
-                                        )
-                                    },
-                                url = cocktailItem.imageUrl ?: ""
-                            )
-                        }
-                        Text(
-                            text = cocktailItem.name ?: "",
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleSmall,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                        )
-
-
-                    }
                 }
             }
         }
     }
 }
+
