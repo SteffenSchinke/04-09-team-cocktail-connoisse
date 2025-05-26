@@ -1,10 +1,10 @@
-package de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository
+package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import kotlinx.coroutines.flow.Flow
 
-interface CocktailApiRepositoryInterface {
+interface CocktailRepositoryInterface {
 
     fun getRandomCocktail(): Flow<Cocktail?>
 
@@ -15,4 +15,10 @@ interface CocktailApiRepositoryInterface {
     fun getCocktailsByName(name: String): Flow<List<Cocktail>>
 
     fun getAllCategories(): Flow<List<Category>>
+
+    fun insertFavoritedCocktail(favoritedCocktail: Cocktail)
+
+    fun deleteFavoritedCocktail(favoritedCocktail: Cocktail)
+
+    fun getAllFavoritedCocktails(): Flow<List<Cocktail>>
 }

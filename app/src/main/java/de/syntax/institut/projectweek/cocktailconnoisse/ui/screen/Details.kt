@@ -150,51 +150,49 @@ object Details : AppRoute, AppRouteContent {
         get() = null
 
 
-}
+    @Composable
+    private fun Content(
 
 
-@Composable
-private fun Content(
+        viewModel: DetailsViewModel,
+        cocktail: Cocktail?
+    ) {
+
+        val isFavorited by viewModel.isFavorited.collectAsState()
+
+        Column(Modifier.fillMaxSize()) {
+
+            cocktail?.let {
+
+                Log.d("Details", "Content: $it")
+
+                Text(
+                    text = it.name ?: "Unbekanter Cocktail",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+
+                CostumAsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(350.dp),
+                    url = it.imageUrl ?: ""
+                )
+
+                IconButton(
+                    onClick = viewModel::updateIsFavorited,
+                    content = {
+                        if (isFavorited)
+                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                        else
+                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                    }
+                )
+            }
 
 
-    viewModel: DetailsViewModel,
-    cocktail: Cocktail?
-) {
+            // TODO sts 25.05.25 content implement
 
-    val isFavorited by viewModel.isFavorited.collectAsState()
-
-    Column(Modifier.fillMaxSize()) {
-
-        cocktail?.let {
-
-            Log.d("Details", "Content: $it")
-
-            Text(
-                text = it.name ?: "Unbekanter Cocktail",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            CostumAsyncImage(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(350.dp),
-                url = it.imageUrl ?: ""
-            )
-
-            IconButton(
-                onClick = viewModel::updateIsFavorited,
-                content = {
-                    if (isFavorited)
-                        Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
-                    else
-                        Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
-                }
-            )
+            // TODO sts 24.05.25 - list horizontal cocktails from self type
         }
-
-
-        // TODO sts 25.05.25 content implement
-
-        // TODO sts 24.05.25 - list horizontal cocktails from self type
     }
 }

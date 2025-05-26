@@ -13,16 +13,16 @@ import kotlinx.coroutines.flow.Flow
 interface CocktailDao {
 
     @Insert(onConflict = OnConflictStrategy.Companion.ABORT)
-    suspend fun insertFavoritedCocktail(cocktail: Cocktail)
+    fun insertFavoritedCocktail(cocktail: Cocktail)
 
     @Update
-    suspend fun updateFavoritedCocktail(cocktail: Cocktail)
+    fun updateFavoritedCocktail(cocktail: Cocktail)
 
     @Query("DELETE FROM cocktail")
-    suspend fun deleteAllFavoritedCocktails()
+    fun deleteAllFavoritedCocktails()
 
     @Delete
-    suspend fun deleteFavoritedCocktail(cocktail: Cocktail)
+    fun deleteFavoritedCocktail(cocktail: Cocktail)
 
     @Query("SELECT * FROM cocktail")
     fun getAllFavoritedCocktails(): Flow<List<Cocktail>>

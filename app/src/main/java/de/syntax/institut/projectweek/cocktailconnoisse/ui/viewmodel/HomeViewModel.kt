@@ -6,8 +6,7 @@ import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +15,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
 
     application: Application,
-    private val cocktailApi: CocktailApiRepositoryInterface,
-    private val cocktailDb: CocktailDBRepositoryInterface
+    private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails
@@ -44,11 +42,11 @@ class HomeViewModel(
 
             try {
 
-                cocktailApi.getRandomCocktail().collect { cocktail ->
+                cocktailRepo.getRandomCocktail().collect { cocktail ->
                     _randomCocktail.value = cocktail
                 }
 
-                cocktailApi.getCocktailsByType(
+                cocktailRepo.getCocktailsByType(
                     if (withAlcoholic.value) CocktailType.ALCOHOLIC.label
                     else CocktailType.NON_ALCOHOLIC.label
                 ).collect { cocktails ->

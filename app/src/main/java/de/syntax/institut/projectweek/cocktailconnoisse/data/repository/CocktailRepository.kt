@@ -1,18 +1,20 @@
-package de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository
+package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiErrorType
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.toDomain
+import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CocktailDao
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class CocktailApiRepository(
+class CocktailRepository(
 
-    private val api: ApiCocktail
-) : CocktailApiRepositoryInterface {
+    private val api: ApiCocktail,
+    private val cocktailDao: CocktailDao
+) : CocktailRepositoryInterface {
 
     override fun getRandomCocktail(): Flow<Cocktail?> = flow {
 
@@ -165,6 +167,21 @@ class CocktailApiRepository(
                 innerMessage = e.localizedMessage,
             )
         }
+    }
+
+    override fun insertFavoritedCocktail(cocktail: Cocktail) {
+
+        cocktailDao.insertFavoritedCocktail(cocktail)
+    }
+
+    override fun deleteFavoritedCocktail(cocktail: Cocktail) {
+
+        cocktailDao.deleteFavoritedCocktail(cocktail)
+    }
+
+    override fun getAllFavoritedCocktails(): Flow<List<Cocktail>> {
+
+        return cocktailDao.getAllFavoritedCocktails()
     }
 
 }
