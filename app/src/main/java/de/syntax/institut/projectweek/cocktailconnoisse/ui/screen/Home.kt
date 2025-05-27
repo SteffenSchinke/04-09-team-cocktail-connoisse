@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
@@ -77,6 +80,8 @@ object Home : AppRouteTab, AppRouteContent {
             SettingsViewModel::class to { koinViewModel<SettingsViewModel>() }
         )
 
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
@@ -102,8 +107,8 @@ object Home : AppRouteTab, AppRouteContent {
 
                     ViewModelState.READY -> {
 
-                        cocktail?.let { cocktail ->
-                            Content(navController, cocktail, cocktails)
+                        cocktail?.let {
+                            Content(navController, it, cocktails, viewModelHome)
                         }
                     }
 
@@ -135,7 +140,7 @@ object Home : AppRouteTab, AppRouteContent {
 
             val viewModel =
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
-            viewModel?.let { viewModel ->
+            viewModel?.let { viewModelHome ->
 
                 Box {
                     CostumTopBarBackground()
@@ -153,7 +158,7 @@ object Home : AppRouteTab, AppRouteContent {
                         actions = {
 
                             Text(
-                                text = if (viewModel.withAlcoholic) {
+                                text = if (viewModelHome.withAlcoholic) {
                                     stringResource(R.string.label_with_alcohol)
                                 } else {
                                     stringResource(R.string.label_without_alcohol)
@@ -164,8 +169,8 @@ object Home : AppRouteTab, AppRouteContent {
                             )
                             Spacer(Modifier.width(10.dp))
                             Switch(
-                                checked = viewModel.withAlcoholic,
-                                onCheckedChange = viewModel::setCocktailType
+                                checked = viewModelHome.withAlcoholic,
+                                onCheckedChange = viewModelHome::setCocktailType
                             )
                         }
                     )
@@ -181,21 +186,22 @@ object Home : AppRouteTab, AppRouteContent {
 
         navController: NavHostController,
         cocktail: Cocktail,
-        cocktails: List<Cocktail>
+        cocktails: List<Cocktail>,
+        homeViewModel: HomeViewModel
     ) {
 
         Column {
 
-            CocktailItem(cocktail, navController)
+                CocktailItem(cocktail, navController, homeViewModel)
 
-            Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(10.dp))
 
-            CocktailList(cocktails, navController)
+                CocktailList(cocktails, navController, homeViewModel)
         }
     }
 
     @Composable
-    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController) {
+    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController, viewModel: HomeViewModel) {
 
         Text(
             text = stringResource(R.string.label_home_title1),
@@ -207,24 +213,40 @@ object Home : AppRouteTab, AppRouteContent {
         Box(
             Modifier.fillMaxWidth().padding(start = 6.dp)
         ) {
-
             CostumShadowBox(
                 elevation = 6.dp,
                 shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
                 cornerRadius = 12.dp,
                 shadowColor = MaterialTheme.colorScheme.secondary
             ) {
-                CostumAsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .clickable {
-                            navController.navigate(
-                                Details.route.replace("{id}", cocktail.id.toString())
-                            )
+                Box {
+                    CostumAsyncImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .clickable {
+                                navController.navigate(
+                                    Details.route.replace("{id}", cocktail.id.toString())
+                                )
+                            },
+                        url = cocktail.imageUrl
+                    )
+                    IconButton(
+                        onClick = {
+                            viewModel.toggleFavorite(cocktail)
                         },
-                    url = cocktail.imageUrl
-                )
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (cocktail.favorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = if (cocktail.favorited) "Unfavorite" else "Favorite",
+                            tint = if (cocktail.favorited) Color.Red else Color.Black
+                        )
+                    }
+                }
+
             }
 
             TextWithShadow(
@@ -232,12 +254,10 @@ object Home : AppRouteTab, AppRouteContent {
                 fontSize = 16.sp
             )
         }
-
-        Spacer(Modifier.height(20.dp))
     }
 
     @Composable
-    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController) {
+    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController, viewModel: HomeViewModel) {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -282,20 +302,36 @@ object Home : AppRouteTab, AppRouteContent {
                         shadowColor = MaterialTheme.colorScheme.secondary
                     ) {
 
-                        CostumAsyncImage(
-                            modifier = Modifier
-                                .width(250.dp)
-                                .height(250.dp)
-                                .clickable {
-                                    navController.navigate(
-                                        Details.route.replace(
-                                            "{id}",
-                                            cocktailItem.id.toString()
+                        Box {
+                            CostumAsyncImage(
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .height(250.dp)
+                                    .clickable {
+                                        navController.navigate(
+                                            Details.route.replace(
+                                                "{id}",
+                                                cocktailItem.id.toString()
+                                            )
                                         )
-                                    )
+                                    },
+                                url = cocktailItem.imageUrl
+                            )
+                            IconButton(
+                                onClick = {
+                                    viewModel.toggleFavorite(cocktailItem)
                                 },
-                            url = cocktailItem.imageUrl
-                        )
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (cocktailItem.favorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                    contentDescription = if (cocktailItem.favorited) "Unfavorite" else "Favorite",
+                                    tint = if (cocktailItem.favorited) Color.Red else Color.Black
+                                )
+                            }
+                        }
                     }
 
                     TextWithShadow(

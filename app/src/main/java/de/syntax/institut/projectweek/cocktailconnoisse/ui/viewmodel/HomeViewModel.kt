@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
@@ -9,7 +10,9 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -34,6 +37,30 @@ class HomeViewModel(
 
     val withAlcoholic: Boolean = _cocktailType.value == CocktailType.ALCOHOLIC
 
+
+    fun toggleFavorite(cocktail: Cocktail) {
+        if (state.value != ViewModelState.READY) return
+
+        setState { ViewModelState.WORKING }
+
+        try {
+            viewModelScope.launch {
+                val newCocktail = cocktailRepo.getCocktailById(cocktail.id.toString())
+                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+                newCocktail.value?.let {
+                    it.favorited = !cocktail.favorited
+                    cocktailRepo.updateCachedCocktail(it)
+                    loadCocktails()
+                }
+                setState { ViewModelState.READY }
+            }
+        } catch (e: ApiError) {
+
+            _apiError.value = e
+            setState { ViewModelState.ERROR }
+        }
+    }
+
     fun loadCocktails() {
 
         if (state.value != ViewModelState.READY) return
@@ -55,6 +82,7 @@ class HomeViewModel(
                     _randomCocktails.value = cocktails
                 }
 
+                Log.d("HomeViewModel", "loadCocktails() ready")
                 setState { ViewModelState.READY }
             } catch (e: ApiError) {
 
@@ -75,4 +103,6 @@ class HomeViewModel(
     fun resetApiError() {
         _apiError.value = null
     }
+
+
 }
