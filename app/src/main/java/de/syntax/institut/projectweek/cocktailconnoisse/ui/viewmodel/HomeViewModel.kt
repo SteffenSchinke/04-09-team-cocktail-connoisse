@@ -20,9 +20,7 @@ class HomeViewModel(
     application: Application,
     private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
-
-    // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails
-
+    
     private val _apiError = MutableStateFlow<ApiError?>(null)
     val apiError: StateFlow<ApiError?> = _apiError
 
