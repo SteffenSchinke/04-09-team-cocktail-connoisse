@@ -17,7 +17,7 @@ fun CategoryDto.toDomain(): Category {
                 "Shake" -> R.drawable.category_shake
                 "Other / Unknown" -> R.drawable.category_other_unknown
                 "Cocoa" -> R.drawable.category_cocoa
-                "Shot" -> R.drawable.ic_launcher_background
+                "Shot" -> R.drawable.category_shot
                 "Coffee / Tea" -> R.drawable.category_coffee_tea
                 "Homemade Liqueur" -> R.drawable.category_homemade_liqueur
                 "Beer" -> R.drawable.category_beer
