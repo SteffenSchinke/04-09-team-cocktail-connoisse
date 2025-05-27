@@ -12,6 +12,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -35,7 +36,13 @@ class HomeViewModel(
     private val _randomCocktails = MutableStateFlow<List<Cocktail>>(emptyList())
     val randomCocktails: StateFlow<List<Cocktail>> = _randomCocktails
 
-    val withAlcoholic: Boolean = _cocktailType.value == CocktailType.ALCOHOLIC
+    val withAlcoholic: StateFlow<Boolean> = cocktailType
+        .map { it == CocktailType.ALCOHOLIC }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = _cocktailType.value == CocktailType.ALCOHOLIC
+        )
 
     private val _updatedCocktail = MutableStateFlow<Cocktail?>(null)
     val updatedCocktail: StateFlow<Cocktail?> = _updatedCocktail
@@ -79,7 +86,7 @@ class HomeViewModel(
                 }
 
                 cocktailRepo.getCocktailsByType(
-                    if (withAlcoholic) CocktailType.ALCOHOLIC.label
+                    if (withAlcoholic.value) CocktailType.ALCOHOLIC.label
                     else CocktailType.NON_ALCOHOLIC.label
                 ).collect { cocktails ->
                     _randomCocktails.value = cocktails
