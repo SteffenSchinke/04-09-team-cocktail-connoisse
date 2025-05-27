@@ -5,25 +5,51 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CocktailDao {
 
-    @Insert(onConflict = OnConflictStrategy.Companion.ABORT)
-    fun insertFavoritedCocktail(cocktail: Cocktail)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCachedCocktail(cocktail: Cocktail)
 
     @Update
-    fun updateFavoritedCocktail(cocktail: Cocktail)
-
-    @Query("DELETE FROM cocktail")
-    fun deleteAllFavoritedCocktails()
+    suspend fun updateCachedCocktail(cocktail: Cocktail)
 
     @Delete
-    fun deleteFavoritedCocktail(cocktail: Cocktail)
+    suspend fun deleteCachedCocktail(cocktail: Cocktail)
 
     @Query("SELECT * FROM cocktail")
-    fun getAllFavoritedCocktails(): Flow<List<Cocktail>>
+    fun getCachedCocktails(): Flow<List<Cocktail>>
+
+    @Query("SELECT * FROM cocktail where id = :id")
+    fun getCachedCocktailById(id: String): Flow<Cocktail?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCachedIngredients(ingredients: List<Ingredient>)
+
+    @Query("DELETE FROM ingredient")
+    suspend fun clearCachedIngredients()
+
+    @Query("DELETE FROM cocktail")
+    suspend fun clearCachedCocktails()
+
+    @Transaction
+    suspend fun insertCachedCocktailWithIngredients(
+        cocktail: Cocktail,
+        ingredients: List<Ingredient>
+    ) {
+        insertCachedCocktail(cocktail)
+        insertCachedIngredients(ingredients.map { it.copy(cocktailId = cocktail.id) })
+    }
+
+    @Transaction
+    suspend fun truncateCache() {
+        clearCachedIngredients()
+        clearCachedCocktails()
+    }
 }

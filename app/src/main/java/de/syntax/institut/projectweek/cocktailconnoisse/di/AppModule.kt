@@ -12,7 +12,6 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewMod
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SuggestionsViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -50,9 +49,6 @@ val appModule = module {
 
     Log.d("KoinModule", "DetailsViewModel")
     viewModelOf(::DetailsViewModel)
-
-    Log.d("KoinModule", "SuggestionsViewModel")
-    viewModelOf(::SuggestionsViewModel)
 
     Log.d("KoinModule", "SettingsViewModel")
     viewModelOf(::SettingsViewModel)

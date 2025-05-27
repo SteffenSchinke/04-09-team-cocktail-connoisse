@@ -77,7 +77,6 @@ object Details : AppRoute, AppRouteContent {
 
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
-                val cocktail by viewModel.cocktail.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val id = navBackStackEntry?.arguments?.getString("id") ?: ""
 
@@ -90,7 +89,7 @@ object Details : AppRoute, AppRouteContent {
 
                 when (viewModelState) {
                     ViewModelState.READY -> {
-                        Content(viewModel, cocktail)
+                        Content(viewModel)
                     }
 
                     ViewModelState.WORKING -> {
@@ -153,11 +152,10 @@ object Details : AppRoute, AppRouteContent {
     @Composable
     private fun Content(
 
-
-        viewModel: DetailsViewModel,
-        cocktail: Cocktail?
+        viewModel: DetailsViewModel
     ) {
 
+        val cocktail by viewModel.cocktail.collectAsState()
         val isFavorited by viewModel.isFavorited.collectAsState()
 
         Column(Modifier.fillMaxSize()) {

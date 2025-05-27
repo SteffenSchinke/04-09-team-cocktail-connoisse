@@ -2,6 +2,7 @@ package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import kotlinx.coroutines.flow.Flow
 
 interface CocktailRepositoryInterface {
@@ -16,9 +17,17 @@ interface CocktailRepositoryInterface {
 
     fun getAllCategories(): Flow<List<Category>>
 
-    fun insertFavoritedCocktail(favoritedCocktail: Cocktail)
 
-    fun deleteFavoritedCocktail(favoritedCocktail: Cocktail)
 
-    fun getAllFavoritedCocktails(): Flow<List<Cocktail>>
+    suspend fun insertCachedCocktailWithIngredients(cocktail: Cocktail, ingredients: List<Ingredient>)
+
+    fun getCachedCocktails(): Flow<List<Cocktail>>
+
+    fun getCachedCocktailById(id: String): Flow<Cocktail?>
+
+    suspend fun deleteCachedCocktail(favoritedCocktail: Cocktail)
+
+    suspend fun updateCachedCocktail(cocktail: Cocktail)
+
+    suspend fun truncateCache()
 }

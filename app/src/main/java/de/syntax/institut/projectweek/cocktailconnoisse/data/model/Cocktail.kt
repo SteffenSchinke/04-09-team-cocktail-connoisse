@@ -13,7 +13,8 @@ data class Cocktail(
     val category: String,
     val instructions: String?,
     val imageUrl: String,
-    val modifiedAt: String?
+    val modifiedAt: String?,
+    var favorited: Boolean = false
 ) {
 
     @Ignore

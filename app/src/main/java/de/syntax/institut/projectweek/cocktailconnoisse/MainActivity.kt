@@ -20,14 +20,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import de.schinke.steffen.ui.helpers.AppLauncher
 import de.schinke.steffen.ui.helpers.AppNavigator
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.Launch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Categories
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Cocktails
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Details
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Favorites
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Home
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.Launch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Suggestions
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
@@ -79,7 +78,6 @@ class MainActivity : ComponentActivity() {
                                 Home,
                                 Favorites,
                                 Categories,
-                                Suggestions,
                                 Settings,
                                 Details,
                                 Filters,
