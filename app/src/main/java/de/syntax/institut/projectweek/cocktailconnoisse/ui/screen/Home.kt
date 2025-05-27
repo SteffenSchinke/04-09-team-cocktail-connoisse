@@ -32,9 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,8 +61,10 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopB
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
+
 
 object Home : AppRouteTab, AppRouteContent {
 
@@ -94,8 +98,9 @@ object Home : AppRouteTab, AppRouteContent {
                 val apiError by viewModelHome.apiError.collectAsState()
                 val cocktail = viewModelHome.randomCocktail.collectAsState().value
                 val cocktails = viewModelHome.randomCocktails.collectAsState().value
+                val updatedCocktail = viewModelHome.updatedCocktail.collectAsState()
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(Unit, updatedCocktail) {
 
                     if (viewModelState == ViewModelState.READY) {
 
@@ -233,16 +238,20 @@ object Home : AppRouteTab, AppRouteContent {
                     )
                     IconButton(
                         onClick = {
-                            viewModel.toggleFavorite(cocktail)
+                            viewModel.updateFavorite(cocktail)
                         },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp)
                     ) {
-                        Icon(
-                            imageVector = if (cocktail.favorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = if (cocktail.favorited) "Unfavorite" else "Favorite",
-                            tint = if (cocktail.favorited) Color.Red else Color.Black
+                        IconButton(
+                            onClick = { viewModel.updateFavorite(cocktail)},
+                            content = {
+                                if (cocktail.favorited)
+                                    Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                                else
+                                    Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                            }
                         )
                     }
                 }
@@ -317,18 +326,23 @@ object Home : AppRouteTab, AppRouteContent {
                                     },
                                 url = cocktailItem.imageUrl
                             )
+
                             IconButton(
                                 onClick = {
-                                    viewModel.toggleFavorite(cocktailItem)
+                                    viewModel.updateFavorite(cocktailItem)
                                 },
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(8.dp)
                             ) {
-                                Icon(
-                                    imageVector = if (cocktailItem.favorited) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                    contentDescription = if (cocktailItem.favorited) "Unfavorite" else "Favorite",
-                                    tint = if (cocktailItem.favorited) Color.Red else Color.Black
+                                IconButton(
+                                    onClick = { viewModel.updateFavorite(cocktailItem)},
+                                    content = {
+                                        if (cocktailItem.favorited)
+                                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                                        else
+                                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                                    }
                                 )
                             }
                         }

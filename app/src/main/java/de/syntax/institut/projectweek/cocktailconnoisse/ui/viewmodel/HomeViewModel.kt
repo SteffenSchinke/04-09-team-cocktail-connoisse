@@ -37,8 +37,10 @@ class HomeViewModel(
 
     val withAlcoholic: Boolean = _cocktailType.value == CocktailType.ALCOHOLIC
 
+    private val _updatedCocktail = MutableStateFlow<Cocktail?>(null)
+    val updatedCocktail: StateFlow<Cocktail?> = _updatedCocktail
 
-    fun toggleFavorite(cocktail: Cocktail) {
+    fun updateFavorite(cocktail: Cocktail) {
         if (state.value != ViewModelState.READY) return
 
         setState { ViewModelState.WORKING }
@@ -50,7 +52,8 @@ class HomeViewModel(
                 newCocktail.value?.let {
                     it.favorited = !cocktail.favorited
                     cocktailRepo.updateCachedCocktail(it)
-                    loadCocktails()
+                    setState { ViewModelState.READY }
+                    _updatedCocktail.value = it
                 }
                 setState { ViewModelState.READY }
             }
