@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
@@ -47,6 +49,7 @@ import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
@@ -203,16 +206,10 @@ object Cocktails: AppRoute, AppRouteContent {
                                 url = cocktail.imageUrl
                             )
                         }
-
-                        Text(
+                        TextWithShadow(
                             text = cocktail.name,
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleSmall,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                        )
+                            fontSize = 16.sp
+                            )
                     }
                 }
             }

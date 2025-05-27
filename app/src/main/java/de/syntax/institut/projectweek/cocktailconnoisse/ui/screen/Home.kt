@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import de.schinke.steffen.enums.ShadowPosition
@@ -54,6 +55,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -227,15 +229,9 @@ object Home : AppRouteTab, AppRouteContent {
                 )
             }
 
-            Text(
+            TextWithShadow(
                 text = cocktail.name,
-                color = Color.White,
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .widthIn(max = 200.dp)
-                    .padding(horizontal = 8.dp)
+                fontSize = 16.sp
             )
         }
 
@@ -304,15 +300,9 @@ object Home : AppRouteTab, AppRouteContent {
                         )
                     }
 
-                    Text(
+                    TextWithShadow(
                         text = cocktailItem.name,
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier
-                            .widthIn(max = 200.dp)
-                            .padding(horizontal = 8.dp)
+                        fontSize = 16.sp
                     )
                 }
             }
