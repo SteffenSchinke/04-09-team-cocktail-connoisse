@@ -177,7 +177,27 @@ class SettingsViewModel(
         viewModelScope.launch {
 
             cocktailDao.truncateCache()
+
+            sendMessageOnSnackbar(
+                message = "Cache wurde gelöscht",
+                mode = SnackbarMode.INFO
+            )
         }
+
+        // TODO sts 27.05.25 - handling ?!?!
+
+//        sendMessageOnSnackbar(
+//            message = "Achtung, du bist dabei die ganzen Cache zu löschen!",
+//            mode = SnackbarMode.TIP,
+//            actionOnNewLine = true,
+//            actionLabel = "Löschen",
+//            duration = SnackbarDisplayTime.INDEFINITE,
+//            actionAction = {
+//                viewModelScope.launch {
+//                    cocktailDao.truncateCache()
+//                }
+//            }
+//        )
     }
 
     private fun configSnackbarMode(newValue: Boolean, mode: SnackbarMode) {
