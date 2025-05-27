@@ -1,7 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -78,17 +76,17 @@ object Cocktails: AppRoute, AppRouteContent {
 
             val viewModel =
                 viewModelMap.getOrDefault(CocktailsViewModel::class, null) as CocktailsViewModel?
-            viewModel?.let { viewModel ->
+            viewModel?.let { viewModelCocktails ->
 
-                val cocktails by viewModel.cocktails.collectAsState()
-                val viewModelState by viewModel.state.collectAsState()
-                val apiError by viewModel.apiError.collectAsState()
+                val cocktails by viewModelCocktails.cocktails.collectAsState()
+                val viewModelState by viewModelCocktails.state.collectAsState()
+                val apiError by viewModelCocktails.apiError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val stringIds= navBackStackEntry?.arguments?.getString("ids") ?: ""
 
                 LaunchedEffect(stringIds) {
                     if (viewModelState == ViewModelState.READY) {
-                        viewModel.setCocktailIds(stringIds.toString())
+                        viewModelCocktails.setCocktailIds(stringIds.toString())
                     }
                 }
 
@@ -104,7 +102,7 @@ object Cocktails: AppRoute, AppRouteContent {
 
                     ViewModelState.ERROR -> {
                         apiError?.let {
-                            viewModel.sendMessageOnSnackbar(
+                            viewModelCocktails.sendMessageOnSnackbar(
                                 message = getStringResourceByName(
                                     apiError?.innerMessage ?: "api_error_unknown"
                                 ),
@@ -112,7 +110,7 @@ object Cocktails: AppRoute, AppRouteContent {
                                 mode = SnackbarMode.ERROR,
                                 duration = SnackbarDisplayTime.INDEFINITE
                             )
-                            viewModel.resetApiError()
+                            viewModelCocktails.resetApiError()
                         }
                         CostumErrorImage()
                     }
