@@ -4,11 +4,10 @@ import android.util.Log
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CocktailDao
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CocktailDatabase
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepository
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepository
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepository
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoriesViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
@@ -22,27 +21,25 @@ val appModule = module {
 
     Log.d("KoinModule", "start AppModule")
 
+    single<ApiCocktail> {
+        ApiCocktail(API_BASE_URL_COCKTAIL)
+    }
+
     single<CocktailDao> {
         Log.d("KoinModule", "CocktailDao")
         CocktailDatabase.getDatabase(get()).cocktailDao()
     }
 
-    single<CocktailDBRepositoryInterface> {
+    single<CocktailRepositoryInterface> {
         Log.d("KoinModule", "FavoritedCocktailRepositoryInterface")
-        CocktailDBRepository(get())
-    }
-
-    single<ApiCocktail> {
-        ApiCocktail(API_BASE_URL_COCKTAIL)
-    }
-
-    single<CocktailApiRepositoryInterface> {
-        Log.d("KoinModule", "CocktailRepositoryInterface")
-        CocktailApiRepository(get())
+        CocktailRepository(get(), get())
     }
 
     Log.d("KoinModule", "HomeViewModel")
     viewModelOf(::HomeViewModel)
+
+    Log.d("KoinModule", "CocktailsViewModel")
+    viewModelOf(::CocktailsViewModel)
 
     Log.d("KoinModule", "CategoryViewModel")
     viewModelOf(::CategoriesViewModel)

@@ -3,16 +3,14 @@ package de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel
 import android.app.Application
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class FavoritesViewModel(
 
     application: Application,
-    private val cocktailApi: CocktailApiRepositoryInterface,
-    private val cocktailDb: CocktailDBRepositoryInterface
+    private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     private val _withAlcoholic = MutableStateFlow(true)

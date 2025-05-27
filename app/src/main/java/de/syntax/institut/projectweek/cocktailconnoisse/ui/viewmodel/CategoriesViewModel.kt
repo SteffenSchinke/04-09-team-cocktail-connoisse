@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class CategoriesViewModel(
 
     application: Application,
-    private val cocktailApi: CocktailApiRepositoryInterface
+    private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     // TODO sts 23.05.25 - implement viewmodel with filtering
@@ -38,7 +38,7 @@ class CategoriesViewModel(
         viewModelScope.launch {
             try {
 
-                cocktailApi.getAllCategories().collect { categories ->
+                cocktailRepo.getAllCategories().collect { categories ->
                     _categories.value = categories
                 }
 

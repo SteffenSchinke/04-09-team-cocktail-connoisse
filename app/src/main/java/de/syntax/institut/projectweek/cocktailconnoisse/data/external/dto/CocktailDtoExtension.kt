@@ -2,8 +2,12 @@ package de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto
 
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 fun CocktailDto.toDomain(): Cocktail {
+
+    val created = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
     val ingredients = listOf(
         ingredient1 to measure1,
@@ -32,11 +36,12 @@ fun CocktailDto.toDomain(): Cocktail {
 
     val cocktail = Cocktail(
         id = id.toLong(),
-        name = name,
-        category = category,
+        name = name ?: "Unbekannter Cocktail",
+        category = category ?: "Unbekannter Kategorie",
         instructions = instructions,
-        imageUrl = imageUrl,
-        modifiedAt = modifiedAt
+        imageUrl = imageUrl ?: "Unbekannte Url",
+        modifiedAt = modifiedAt,
+        createdAt = created
     )
     cocktail.ingredients = ingredients
 

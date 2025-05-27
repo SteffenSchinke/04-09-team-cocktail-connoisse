@@ -42,7 +42,6 @@ import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
-import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
@@ -77,7 +76,6 @@ object Details : AppRoute, AppRouteContent {
 
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
-                val cocktail by viewModel.cocktail.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val id = navBackStackEntry?.arguments?.getString("id") ?: ""
 
@@ -90,7 +88,7 @@ object Details : AppRoute, AppRouteContent {
 
                 when (viewModelState) {
                     ViewModelState.READY -> {
-                        Content(viewModel, cocktail)
+                        Content(viewModel)
                     }
 
                     ViewModelState.WORKING -> {
@@ -150,51 +148,48 @@ object Details : AppRoute, AppRouteContent {
         get() = null
 
 
-}
+    @Composable
+    private fun Content(
+
+        viewModel: DetailsViewModel
+    ) {
+
+        val cocktail by viewModel.cocktail.collectAsState()
+        val isFavorited by viewModel.isFavorited.collectAsState()
+
+        Column(Modifier.fillMaxSize()) {
+
+            cocktail?.let {
+
+                Log.d("Details", "Content: $it")
+
+                Text(
+                    text = it.name,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+
+                CostumAsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(350.dp),
+                    url = it.imageUrl
+                )
+
+                IconButton(
+                    onClick = viewModel::updateIsFavorited,
+                    content = {
+                        if (isFavorited)
+                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                        else
+                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                    }
+                )
+            }
 
 
-@Composable
-private fun Content(
+            // TODO sts 25.05.25 content implement
 
-
-    viewModel: DetailsViewModel,
-    cocktail: Cocktail?
-) {
-
-    val isFavorited by viewModel.isFavorited.collectAsState()
-
-    Column(Modifier.fillMaxSize()) {
-
-        cocktail?.let {
-
-            Log.d("Details", "Content: $it")
-
-            Text(
-                text = it.name ?: "Unbekanter Cocktail",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            CostumAsyncImage(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(350.dp),
-                url = it.imageUrl ?: ""
-            )
-
-            IconButton(
-                onClick = viewModel::updateIsFavorited,
-                content = {
-                    if (isFavorited)
-                        Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
-                    else
-                        Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
-                }
-            )
+            // TODO sts 24.05.25 - list horizontal cocktails from self type
         }
-
-
-        // TODO sts 25.05.25 content implement
-
-        // TODO sts 24.05.25 - list horizontal cocktails from self type
     }
 }

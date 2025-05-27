@@ -80,9 +80,9 @@ object Favorites : AppRouteTab, AppRouteContent {
 
                             Text(
                                 text = if (withAlcoholic) {
-                                    stringResource(R.string.lable_with_alcohol)
+                                    stringResource(R.string.label_with_alcohol)
                                 } else {
-                                    stringResource(R.string.lable_without_alcohol)
+                                    stringResource(R.string.label_without_alcohol)
 
                                 },
                                 style = MaterialTheme.typography.titleMedium,

@@ -1,16 +1,18 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -20,18 +22,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
@@ -42,11 +48,14 @@ import de.schinke.steffen.interfaces.AppRouteTab
 import de.schinke.steffen.ui.components.CostumAsyncImage
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
+import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
 
@@ -64,7 +73,8 @@ object Home : AppRouteTab, AppRouteContent {
 
     override val viewModelDependencies: Map<KClass<out ViewModel>, @Composable (() -> ViewModel)>
         get() = mapOf(
-            HomeViewModel::class to { koinViewModel<HomeViewModel>() }
+            HomeViewModel::class to { koinViewModel<HomeViewModel>() },
+            SettingsViewModel::class to { koinViewModel<SettingsViewModel>() }
         )
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -73,25 +83,28 @@ object Home : AppRouteTab, AppRouteContent {
 
             val viewModel =
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
-            viewModel?.let { viewModel ->
+            viewModel?.let { viewModelHome ->
 
-                val viewModelState by viewModel.state.collectAsState()
-                val apiError by viewModel.apiError.collectAsState()
-                val randomCocktail by viewModel.randomCocktail.collectAsState()
-                val randomCocktails by viewModel.randomCocktails.collectAsState()
+                val viewModelState by viewModelHome.state.collectAsState()
+                val apiError by viewModelHome.apiError.collectAsState()
+                val cocktail = viewModelHome.randomCocktail.collectAsState().value
+                val cocktails = viewModelHome.randomCocktails.collectAsState().value
 
                 LaunchedEffect(Unit) {
 
                     if (viewModelState == ViewModelState.READY) {
 
-                        viewModel.loadCocktails()
+                        viewModelHome.loadCocktails()
                     }
                 }
 
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(viewModel, navController, randomCocktail, randomCocktails)
+
+                        cocktail?.let { cocktail ->
+                            Content(navController, cocktail, cocktails)
+                        }
                     }
 
                     ViewModelState.WORKING -> {
@@ -100,7 +113,7 @@ object Home : AppRouteTab, AppRouteContent {
 
                     ViewModelState.ERROR -> {
                         apiError?.let {
-                            viewModel.sendMessageOnSnackbar(
+                            viewModelHome.sendMessageOnSnackbar(
                                 message = getStringResourceByName(
                                     apiError?.innerMessage ?: "api_error_unknown"
                                 ),
@@ -108,7 +121,7 @@ object Home : AppRouteTab, AppRouteContent {
                                 mode = SnackbarMode.ERROR,
                                 duration = SnackbarDisplayTime.INDEFINITE
                             )
-                            viewModel.resetApiError()
+                            viewModelHome.resetApiError()
                         }
                         CostumErrorImage()
                     }
@@ -143,9 +156,9 @@ object Home : AppRouteTab, AppRouteContent {
 
                             Text(
                                 text = if (withAlcoholic) {
-                                    stringResource(R.string.lable_with_alcohol)
+                                    stringResource(R.string.label_with_alcohol)
                                 } else {
-                                    stringResource(R.string.lable_without_alcohol)
+                                    stringResource(R.string.label_without_alcohol)
 
                                 },
                                 style = MaterialTheme.typography.titleMedium,
@@ -166,61 +179,134 @@ object Home : AppRouteTab, AppRouteContent {
         get() = null
 
     @Composable
-    private fun Content(
-        viewModel: HomeViewModel,
+    internal fun Content(
+
         navController: NavHostController,
-        cocktail: Cocktail?,
+        cocktail: Cocktail,
         cocktails: List<Cocktail>
     ) {
 
-        Column(Modifier.fillMaxSize()) {
+        Column {
 
-            cocktail?.let {
+            CocktailItem(cocktail, navController)
 
-                Log.d("Cocktails", "Cocktail: $cocktail")
+            Spacer(Modifier.height(20.dp))
 
-                Text(
-                    text = stringResource(R.string.lable_cocktail_title1),
-                    style = MaterialTheme.typography.headlineSmall
-                )
+            CocktailList(cocktails, navController)
+        }
+    }
 
+    @Composable
+    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController) {
+
+        Text(
+            text = stringResource(R.string.label_home_title1),
+            style = MaterialTheme.typography.headlineSmall
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Box(
+            Modifier.fillMaxWidth().padding(start = 6.dp)
+        ) {
+
+            CostumShadowBox(
+                elevation = 6.dp,
+                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                cornerRadius = 12.dp,
+                shadowColor = MaterialTheme.colorScheme.secondary
+            ) {
                 CostumAsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(250.dp)
-                        .clickable(onClick = {
-                            navController.navigate(Details.route.replace("{id}", it.id.toString()))
-                        }),
-                    url = it.imageUrl ?: ""
+                        .clickable {
+                            navController.navigate(
+                                Details.route.replace("{id}", cocktail.id.toString())
+                            )
+                        },
+                    url = cocktail.imageUrl
                 )
             }
 
+            TextWithShadow(
+                text = cocktail.name,
+                fontSize = 16.sp
+            )
+        }
+
+        Spacer(Modifier.height(20.dp))
+    }
+
+    @Composable
+    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                text = stringResource(R.string.lable_cocktail_title2),
+                text = stringResource(R.string.label_home_title2),
                 style = MaterialTheme.typography.headlineSmall
             )
 
-            LazyColumn {
+            TextButton(
+                onClick = {
 
-                items(cocktails) {
+                    val route = Cocktails.route
+                        .replace("{ids}", cocktails
+                            .shuffled()
+                            .take(30)
+                            .joinToString(",") { it.id.toString() })
+                        .replace("{top_bar_title}", "sheet_suggestions")
+                    navController.navigate(route)
+                },
+                content = { Text(stringResource(R.string.label_home_title3)) }
+            )
+        }
 
-                    Log.d("Cocktails", "Cocktail item: $it")
+        Spacer(Modifier.height(10.dp))
 
-                    CostumAsyncImage(
-                        modifier = Modifier
-                            .clickable(onClick = {
-                                navController.navigate(
-                                    Details.route.replace(
-                                        "{id}",
-                                        it.id.toString()
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            contentPadding = PaddingValues(5.dp)
+        ) {
+            items(cocktails.take(10)) { cocktailItem ->
+
+                Box(
+                    Modifier.fillMaxWidth()
+                ) {
+                    CostumShadowBox(
+                        elevation = 6.dp,
+                        shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                        cornerRadius = 12.dp,
+                        shadowColor = MaterialTheme.colorScheme.secondary
+                    ) {
+
+                        CostumAsyncImage(
+                            modifier = Modifier
+                                .width(250.dp)
+                                .height(250.dp)
+                                .clickable {
+                                    navController.navigate(
+                                        Details.route.replace(
+                                            "{id}",
+                                            cocktailItem.id.toString()
+                                        )
                                     )
-                                )
-                            }),
-                        url = it.imageUrl ?: "",
-                        size = 120.dp
+                                },
+                            url = cocktailItem.imageUrl
+                        )
+                    }
+
+                    TextWithShadow(
+                        text = cocktailItem.name,
+                        fontSize = 16.sp
                     )
                 }
             }
         }
     }
 }
+

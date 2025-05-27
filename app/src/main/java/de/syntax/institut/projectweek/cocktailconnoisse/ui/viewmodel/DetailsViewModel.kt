@@ -6,17 +6,19 @@ import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.repository.CocktailApiRepositoryInterface
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.repository.CocktailDBRepositoryInterface
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class DetailsViewModel(
 
     application: Application,
-    private val cocktailApi: CocktailApiRepositoryInterface,
-    private val cocktailDb: CocktailDBRepositoryInterface
+    private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     private val _cocktail = MutableStateFlow<Cocktail?>(null)
@@ -25,8 +27,10 @@ class DetailsViewModel(
     private val _apiError = MutableStateFlow<ApiError?>(null)
     val apiError: StateFlow<ApiError?> = _apiError
 
-    private val _isFavorited = MutableStateFlow(false)
-    val isFavorited: StateFlow<Boolean> = _isFavorited
+    val isFavorited: StateFlow<Boolean> = _cocktail
+        .filterNotNull()
+        .map { it.favorited }
+        .stateIn( viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     fun loadCocktailById(id: String) {
 
@@ -37,7 +41,7 @@ class DetailsViewModel(
         viewModelScope.launch {
 
             try {
-                cocktailApi.getCocktailById(id).collect { cocktail ->
+                cocktailRepo.getCocktailById(id).collect { cocktail ->
                     _cocktail.value = cocktail
                 }
 
@@ -52,15 +56,12 @@ class DetailsViewModel(
 
     fun updateIsFavorited() {
 
-        _isFavorited.value = !_isFavorited.value
-
         _cocktail.value?.let {
             viewModelScope.launch {
-                if (_isFavorited.value) {
-                    cocktailDb.insertFavoritedCocktail(it)
-                } else {
-                    cocktailDb.deleteFavoritedCocktail(it)
-                }
+
+                val newCocktail = it.copy(favorited = !it.favorited)
+                cocktailRepo.updateCachedCocktail(newCocktail)
+                _cocktail.value = newCocktail
             }
         }
     }
