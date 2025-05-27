@@ -27,7 +27,6 @@ class HomeViewModel(
     val apiError: StateFlow<ApiError?> = _apiError
 
     private val _cocktailType = MutableStateFlow(CocktailType.ALCOHOLIC)
-    val cocktailType: StateFlow<CocktailType> = _cocktailType
 
     private val _randomCocktail = MutableStateFlow<Cocktail?>(null)
     val randomCocktail: StateFlow<Cocktail?> = _randomCocktail
