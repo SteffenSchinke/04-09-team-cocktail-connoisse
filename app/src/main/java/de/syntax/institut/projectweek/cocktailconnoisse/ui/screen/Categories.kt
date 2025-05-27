@@ -2,6 +2,7 @@ package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.R.attr.bottom
 import android.R.attr.contentDescription
+import android.R.attr.shadowColor
 import android.R.attr.text
 import android.os.Bundle
 import android.util.Log
@@ -232,7 +233,7 @@ object Categories : AppRouteTab, AppRouteContent {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 6.dp)
-                .padding(bottom = 20.dp, top = 10.dp)
+                .padding(bottom = 30.dp, top = 10.dp)
         ) {
             CostumShadowBox(
                 elevation = 6.dp,
@@ -271,12 +272,10 @@ object Categories : AppRouteTab, AppRouteContent {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 15.dp)
-        )
+                .padding(bottom = 20.dp))
         {
-            Box(
-                Modifier
-                    .padding(start = 6.dp)
+            Box(Modifier
+                .padding(start = 6.dp)
 
             ) {
                 CostumShadowBox(
@@ -312,7 +311,7 @@ object Categories : AppRouteTab, AppRouteContent {
                 )
             }
 
-            Spacer(modifier = Modifier.width(50.dp))
+            Spacer(modifier = Modifier.width(40.dp))
 
             Box(
                 Modifier
@@ -332,6 +331,7 @@ object Categories : AppRouteTab, AppRouteContent {
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(20.dp))
+
                             .clickable(onClick = {
                                 /* navController.navigate(
                                      Details.route.replace(
@@ -341,6 +341,7 @@ object Categories : AppRouteTab, AppRouteContent {
 
                                 )*/
                             }),
+
                         painter = painterResource(id = categoryTwo.imageId),
                         contentDescription = categoryTwo.name
                     )
