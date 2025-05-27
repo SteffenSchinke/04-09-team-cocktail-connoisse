@@ -10,6 +10,8 @@ import androidx.room.Update
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 @Dao
 interface CocktailDao {
@@ -37,6 +39,12 @@ interface CocktailDao {
 
     @Query("DELETE FROM cocktail")
     suspend fun clearCachedCocktails()
+
+    @Query("SELECT COUNT(*) FROM cocktail")
+    fun getCocktailCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM ingredient")
+    fun getIngredientCount(): Flow<Int>
 
     @Transaction
     suspend fun insertCachedCocktailWithIngredients(

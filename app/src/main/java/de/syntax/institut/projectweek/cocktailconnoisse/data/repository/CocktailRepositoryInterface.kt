@@ -1,5 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
+import androidx.room.Query
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
@@ -30,4 +31,6 @@ interface CocktailRepositoryInterface {
     suspend fun updateCachedCocktail(cocktail: Cocktail)
 
     suspend fun truncateCache()
+
+    fun isCacheEmpty(): Flow<Boolean>
 }

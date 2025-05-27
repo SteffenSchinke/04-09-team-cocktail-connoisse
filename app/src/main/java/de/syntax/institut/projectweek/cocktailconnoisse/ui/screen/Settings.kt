@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -63,54 +65,92 @@ object Settings : AppRouteTab, AppRouteContent {
                 viewModelMap.getOrDefault(SettingsViewModel::class, null) as SettingsViewModel?
             viewModel?.let { viewModel ->
 
-                val isDarkMode by viewModel.isDarkMode.collectAsState()
+                val isDarkMode by viewModel.isDarkTheme.collectAsState()
                 val isNotificationInfo by viewModel.isNotificationInfo.collectAsState()
                 val isNotificationTip by viewModel.isNotificationTip.collectAsState()
                 val isNotificationError by viewModel.isNotificationError.collectAsState()
+                val isCacheEmpty by viewModel.isCacheEmpty.collectAsState()
 
                 Column(Modifier.fillMaxSize()) {
 
                     Text(
-                        stringResource(R.string.lable_display),
+                        stringResource(R.string.label_display),
                         modifier = Modifier.padding(bottom = 20.dp),
                         style = MaterialTheme.typography.headlineSmall
                     )
 
                     SwitchRow(
                         isDarkMode,
-                        stringResource(R.string.lable_dark_mode_enabled),
-                        stringResource(R.string.lable_dark_mode_disabled),
+                        stringResource(R.string.label_dark_mode_enabled),
+                        stringResource(R.string.label_dark_mode_disabled),
                         viewModel::toggleIsDarkMode
                     )
 
                     Spacer(Modifier.height(20.dp))
 
                     Text(
-                        stringResource(R.string.lable_notifications),
+                        stringResource(R.string.label_notifications),
                         modifier = Modifier.padding(bottom = 20.dp),
                         style = MaterialTheme.typography.headlineSmall
                     )
 
                     SwitchRow(
                         isNotificationInfo,
-                        stringResource(R.string.lable_notification_info_on),
-                        stringResource(R.string.lable_notification_info_off),
+                        stringResource(R.string.label_notification_info_on),
+                        stringResource(R.string.label_notification_info_off),
                         viewModel::toggleIsNotificationInfo
                     )
 
                     SwitchRow(
                         isNotificationTip,
-                        stringResource(R.string.lable_notification_tip_on),
-                        stringResource(R.string.lable_notification_tip_off),
+                        stringResource(R.string.label_notification_tip_on),
+                        stringResource(R.string.label_notification_tip_off),
                         viewModel::toggleIsNotificationTip
                     )
 
                     SwitchRow(
                         isNotificationError,
-                        stringResource(R.string.lable_notification_error_on),
-                        stringResource(R.string.lable_notification_error_off),
+                        stringResource(R.string.label_notification_error_on),
+                        stringResource(R.string.label_notification_error_off),
                         viewModel::toggleIsNotificationError
                     )
+
+                    Spacer(Modifier.weight(1f))
+
+                    Text(
+                        text = stringResource(R.string.label_cache),
+                        modifier = Modifier.padding(bottom = 20.dp),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            text = stringResource(R.string.label_cache_hit),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        
+                        Spacer(Modifier.weight(1f))
+
+                        TextButton(
+                            onClick = viewModel::deleteCache,
+                            enabled = !isCacheEmpty,
+                            content = {
+                                Text(
+                                    text = stringResource(R.string.label_cache_btn),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                        ) 
+                    }
+
+                    Spacer(Modifier.height(20.dp))
                 }
             }
         }

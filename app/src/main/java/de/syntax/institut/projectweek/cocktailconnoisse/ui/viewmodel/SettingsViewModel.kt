@@ -10,6 +10,7 @@ import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
 import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.services.AppSnackbar
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.dataStore
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +26,8 @@ private val DATASTORE_IS_NOTIFICATION_ERROR = booleanPreferencesKey("isNotificat
 
 class SettingsViewModel(
 
-    application: Application
+    application: Application,
+    private val cocktailDao: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     private val _dataStore = application.dataStore
@@ -48,7 +50,10 @@ class SettingsViewModel(
         }
     }
 
-    val isDarkMode: StateFlow<Boolean> = _dataStore.data
+    val isCacheEmpty: StateFlow<Boolean> = cocktailDao.isCacheEmpty()
+        .stateIn( _scope, SharingStarted.WhileSubscribed(), true)
+
+    val isDarkTheme: StateFlow<Boolean> = _dataStore.data
         .map { prefs -> prefs[DATASTORE_IS_DARK_MODE] == true }
         .stateIn(
             scope = _scope,
@@ -165,6 +170,14 @@ class SettingsViewModel(
             if (newValue) "Benachrichtigungen bei Error wurde aktiviert"
             else "Benachrichtigungen bei Error wurde deaktiviert"
         )
+    }
+
+    fun deleteCache() {
+
+        viewModelScope.launch {
+
+            cocktailDao.truncateCache()
+        }
     }
 
     private fun configSnackbarMode(newValue: Boolean, mode: SnackbarMode) {

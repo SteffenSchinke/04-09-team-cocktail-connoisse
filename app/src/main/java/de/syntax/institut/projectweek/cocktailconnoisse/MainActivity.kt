@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val viewModel: SettingsViewModel = koinViewModel()
-            val isDarkTheme = viewModel.isDarkMode.collectAsState().value
+            val isDarkTheme = viewModel.isDarkTheme.collectAsState().value
 
             // status panel customization
             SideEffect {

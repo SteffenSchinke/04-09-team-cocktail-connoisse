@@ -154,9 +154,9 @@ object Home : AppRouteTab, AppRouteContent {
 
                             Text(
                                 text = if (viewModel.withAlcoholic) {
-                                    stringResource(R.string.lable_with_alcohol)
+                                    stringResource(R.string.label_with_alcohol)
                                 } else {
-                                    stringResource(R.string.lable_without_alcohol)
+                                    stringResource(R.string.label_without_alcohol)
 
                                 },
                                 style = MaterialTheme.typography.titleMedium,
@@ -198,7 +198,7 @@ object Home : AppRouteTab, AppRouteContent {
     private fun CocktailItem(cocktail: Cocktail, navController: NavHostController) {
 
         Text(
-            text = stringResource(R.string.lable_home_title1),
+            text = stringResource(R.string.label_home_title1),
             style = MaterialTheme.typography.headlineSmall
         )
 
@@ -251,7 +251,7 @@ object Home : AppRouteTab, AppRouteContent {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.lable_home_title2),
+                text = stringResource(R.string.label_home_title2),
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -263,7 +263,7 @@ object Home : AppRouteTab, AppRouteContent {
                         .replace("{top_bar_title}", "sheet_suggestions")
                     navController.navigate(route)
                 },
-                content = { Text(stringResource(R.string.lable_home_title3)) }
+                content = { Text(stringResource(R.string.label_home_title3)) }
             )
         }
 

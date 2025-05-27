@@ -1,5 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
+import androidx.room.Query
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiErrorType
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -24,6 +26,13 @@ class CocktailRepository(
     private val api: ApiCocktail,
     private val cocktailDao: CocktailDao
 ) : CocktailRepositoryInterface {
+
+    override fun isCacheEmpty(): Flow<Boolean> = combine(
+        cocktailDao.getCocktailCount(),
+        cocktailDao.getIngredientCount()
+    ) { cocktailCount, ingredientCount ->
+        cocktailCount == 0 && ingredientCount == 0
+    }
 
     override fun getRandomCocktail(): Flow<Cocktail?> = flow {
 
@@ -245,17 +254,15 @@ class CocktailRepository(
     }
 
     override suspend fun updateCachedCocktail(cocktail: Cocktail) {
-
         cocktailDao.updateCachedCocktail(cocktail)
     }
 
     override suspend fun deleteCachedCocktail(cocktail: Cocktail) {
-
         cocktailDao.deleteCachedCocktail(cocktail)
     }
 
     override suspend fun truncateCache() {
-
         cocktailDao.truncateCache()
     }
+
 }
