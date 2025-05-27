@@ -8,10 +8,9 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.CocktailWithIngredients
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 
 @Dao
 interface CocktailDao {
@@ -25,11 +24,13 @@ interface CocktailDao {
     @Delete
     suspend fun deleteCachedCocktail(cocktail: Cocktail)
 
+    @Transaction
     @Query("SELECT * FROM cocktail")
-    fun getCachedCocktails(): Flow<List<Cocktail>>
+    fun getCachedCocktails(): Flow<List<CocktailWithIngredients>>
 
+    @Transaction
     @Query("SELECT * FROM cocktail where id = :id")
-    fun getCachedCocktailById(id: String): Flow<Cocktail?>
+    fun getCachedCocktailById(id: String): Flow<CocktailWithIngredients?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCachedIngredients(ingredients: List<Ingredient>)

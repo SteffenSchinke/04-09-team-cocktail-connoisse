@@ -1,7 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
