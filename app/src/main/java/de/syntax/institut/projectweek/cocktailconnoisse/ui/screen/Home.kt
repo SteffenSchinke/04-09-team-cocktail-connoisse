@@ -259,7 +259,10 @@ object Home : AppRouteTab, AppRouteContent {
                 onClick = {
 
                     val route = Cocktails.route
-                        .replace("{ids}", cocktails.joinToString(",") { it.id.toString() })
+                        .replace("{ids}", cocktails
+                            .shuffled()
+                            .take(30)
+                            .joinToString(",") { it.id.toString() })
                         .replace("{top_bar_title}", "sheet_suggestions")
                     navController.navigate(route)
                 },

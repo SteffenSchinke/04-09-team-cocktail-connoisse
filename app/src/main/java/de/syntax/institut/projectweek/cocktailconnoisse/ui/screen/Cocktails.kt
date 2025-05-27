@@ -82,7 +82,6 @@ object Cocktails: AppRoute, AppRouteContent {
                 val apiError by viewModel.apiError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val stringIds= navBackStackEntry?.arguments?.getString("ids") ?: ""
-                viewModel.setCocktailIds(stringIds.toString())
 
                 LaunchedEffect(stringIds) {
                     if (viewModelState == ViewModelState.READY) {
