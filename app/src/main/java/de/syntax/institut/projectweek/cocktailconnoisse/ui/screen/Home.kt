@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
@@ -29,9 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,8 +61,10 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopB
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
+
 
 object Home : AppRouteTab, AppRouteContent {
 
@@ -77,6 +84,8 @@ object Home : AppRouteTab, AppRouteContent {
             SettingsViewModel::class to { koinViewModel<SettingsViewModel>() }
         )
 
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
@@ -89,8 +98,9 @@ object Home : AppRouteTab, AppRouteContent {
                 val apiError by viewModelHome.apiError.collectAsState()
                 val cocktail = viewModelHome.randomCocktail.collectAsState().value
                 val cocktails = viewModelHome.randomCocktails.collectAsState().value
+                val updatedCocktail = viewModelHome.updatedCocktail.collectAsState()
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(Unit, updatedCocktail) {
 
                     if (viewModelState == ViewModelState.READY) {
 
@@ -102,8 +112,8 @@ object Home : AppRouteTab, AppRouteContent {
 
                     ViewModelState.READY -> {
 
-                        cocktail?.let { cocktail ->
-                            Content(navController, cocktail, cocktails)
+                        cocktail?.let {
+                            Content(navController, it, cocktails, viewModelHome)
                         }
                     }
 
@@ -135,9 +145,7 @@ object Home : AppRouteTab, AppRouteContent {
 
             val viewModel =
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
-            viewModel?.let { viewModel ->
-
-                val withAlcoholic by viewModel.withAlcoholic.collectAsState()
+            viewModel?.let { viewModelHome ->
 
                 Box {
                     CostumTopBarBackground()
@@ -155,7 +163,7 @@ object Home : AppRouteTab, AppRouteContent {
                         actions = {
 
                             Text(
-                                text = if (withAlcoholic) {
+                                text = if (viewModelHome.withAlcoholic) {
                                     stringResource(R.string.label_with_alcohol)
                                 } else {
                                     stringResource(R.string.label_without_alcohol)
@@ -166,8 +174,8 @@ object Home : AppRouteTab, AppRouteContent {
                             )
                             Spacer(Modifier.width(10.dp))
                             Switch(
-                                checked = withAlcoholic,
-                                onCheckedChange = viewModel::setCocktailType
+                                checked = viewModelHome.withAlcoholic,
+                                onCheckedChange = viewModelHome::setCocktailType
                             )
                         }
                     )
@@ -183,21 +191,22 @@ object Home : AppRouteTab, AppRouteContent {
 
         navController: NavHostController,
         cocktail: Cocktail,
-        cocktails: List<Cocktail>
+        cocktails: List<Cocktail>,
+        homeViewModel: HomeViewModel
     ) {
 
         Column {
 
-            CocktailItem(cocktail, navController)
+                CocktailItem(cocktail, navController, homeViewModel)
 
-            Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(10.dp))
 
-            CocktailList(cocktails, navController)
+                CocktailList(cocktails, navController, homeViewModel)
         }
     }
 
     @Composable
-    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController) {
+    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController, viewModel: HomeViewModel) {
 
         Text(
             text = stringResource(R.string.label_home_title1),
@@ -209,24 +218,44 @@ object Home : AppRouteTab, AppRouteContent {
         Box(
             Modifier.fillMaxWidth().padding(start = 6.dp)
         ) {
-
             CostumShadowBox(
                 elevation = 6.dp,
                 shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
                 cornerRadius = 12.dp,
                 shadowColor = MaterialTheme.colorScheme.secondary
             ) {
-                CostumAsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .clickable {
-                            navController.navigate(
-                                Details.route.replace("{id}", cocktail.id.toString())
-                            )
+                Box {
+                    CostumAsyncImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .clickable {
+                                navController.navigate(
+                                    Details.route.replace("{id}", cocktail.id.toString())
+                                )
+                            },
+                        url = cocktail.imageUrl
+                    )
+                    IconButton(
+                        onClick = {
+                            viewModel.updateFavorite(cocktail)
                         },
-                    url = cocktail.imageUrl
-                )
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { viewModel.updateFavorite(cocktail)},
+                            content = {
+                                if (cocktail.favorited)
+                                    Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                                else
+                                    Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                            }
+                        )
+                    }
+                }
+
             }
 
             TextWithShadow(
@@ -234,12 +263,10 @@ object Home : AppRouteTab, AppRouteContent {
                 fontSize = 16.sp
             )
         }
-
-        Spacer(Modifier.height(20.dp))
     }
 
     @Composable
-    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController) {
+    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController, viewModel: HomeViewModel) {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -284,20 +311,41 @@ object Home : AppRouteTab, AppRouteContent {
                         shadowColor = MaterialTheme.colorScheme.secondary
                     ) {
 
-                        CostumAsyncImage(
-                            modifier = Modifier
-                                .width(250.dp)
-                                .height(250.dp)
-                                .clickable {
-                                    navController.navigate(
-                                        Details.route.replace(
-                                            "{id}",
-                                            cocktailItem.id.toString()
+                        Box {
+                            CostumAsyncImage(
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .height(250.dp)
+                                    .clickable {
+                                        navController.navigate(
+                                            Details.route.replace(
+                                                "{id}",
+                                                cocktailItem.id.toString()
+                                            )
                                         )
-                                    )
+                                    },
+                                url = cocktailItem.imageUrl
+                            )
+
+                            IconButton(
+                                onClick = {
+                                    viewModel.updateFavorite(cocktailItem)
                                 },
-                            url = cocktailItem.imageUrl
-                        )
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                            ) {
+                                IconButton(
+                                    onClick = { viewModel.updateFavorite(cocktailItem)},
+                                    content = {
+                                        if (cocktailItem.favorited)
+                                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                                        else
+                                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                                    }
+                                )
+                            }
+                        }
                     }
 
                     TextWithShadow(
