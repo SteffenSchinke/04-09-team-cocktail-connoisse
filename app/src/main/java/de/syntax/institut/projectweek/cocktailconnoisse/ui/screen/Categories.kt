@@ -1,5 +1,8 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
+import android.R.attr.bottom
+import android.R.attr.contentDescription
+import android.R.attr.text
 import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -11,9 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
@@ -39,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import coil3.compose.AsyncImagePainter.State.Empty.painter
+import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
@@ -48,6 +55,7 @@ import de.schinke.steffen.interfaces.AppRouteSheet
 import de.schinke.steffen.interfaces.AppRouteTab
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
+import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
@@ -160,10 +168,7 @@ object Categories : AppRouteTab, AppRouteContent {
 
             Log.d("Categories", "categories: $categories")
 
-            LazyColumn(
-
-            ) {
-
+            LazyColumn {
                 item {
                     OneItem(
                         category = categories[0],
@@ -216,8 +221,6 @@ object Categories : AppRouteTab, AppRouteContent {
                     )
                 }
             }
-
-
         }
     }
 
@@ -225,25 +228,37 @@ object Categories : AppRouteTab, AppRouteContent {
     @Composable
     private fun OneItem(category: Category, navController: NavHostController) {
 
-        Box {
-            Image(
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .fillMaxWidth()
-                    .clickable(onClick = {
-                        /*navController.navigate(
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 6.dp)
+                .padding(bottom = 20.dp, top = 10.dp)
+        ) {
+            CostumShadowBox(
+                elevation = 6.dp,
+                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                cornerRadius = 20.dp,
+                shadowColor = MaterialTheme.colorScheme.secondary
+            ) {
+                Image(
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .fillMaxWidth()
+                        .clickable(onClick = {
+                            /*navController.navigate(
                             Details.route.replace(
                                 "{id}",
                                 category
                             )
 
                         )*/
-                    }),
-                painter = painterResource(id = category.imageId),
-                contentDescription = category.name
-            )
+                        }),
+                    painter = painterResource(id = category.imageId),
+                    contentDescription = category.name
+                )
+            }
             TextWithShadow(
                 text = category.name,
                 fontSize = 16.sp
@@ -253,54 +268,83 @@ object Categories : AppRouteTab, AppRouteContent {
 
     @Composable
     fun TwoItems(categoryOne: Category, categoryTwo: Category, navController: NavHostController) {
-        Row {
-            Box {
-                Image(
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable(onClick = {
-                            /*
-                            navController.navigate(
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 15.dp)
+        )
+        {
+            Box(
+                Modifier
+                    .padding(start = 6.dp)
 
-                                Details.route.replace(
-                                    "{id}",
-                                    category
-                                )
-                        )*/
-                        }),
-                    painter = painterResource(id = categoryOne.imageId),
-                    contentDescription = categoryOne.name
-                )
+            ) {
+                CostumShadowBox(
+                    Modifier
+                        .height(180.dp)
+                        .width(180.dp),
+                        elevation = 6.dp,
+                    shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                    cornerRadius = 20.dp,
+                    shadowColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Image(
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable(onClick = {
+                                /* navController.navigate(
+                                     Details.route.replace(
+                                         "{id}",
+                                         category
+                                     )
+
+                                )*/
+                            }),
+                        painter = painterResource(id = categoryOne.imageId),
+                        contentDescription = categoryOne.name
+                    )
+                }
                 TextWithShadow(
                     text = categoryOne.name,
                     fontSize = 16.sp
                 )
-
             }
-            Spacer(
-                modifier = Modifier
-                    .width(10.dp)
-            )
-            Box {
-                Image(
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(200.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable(onClick = {
-                            /* navController.navigate(
-                                 Details.route.replace(
-                                     "{id}",
-                                     category
-                                 )
 
-                            )*/
-                        }),
-                    painter = painterResource(id = categoryTwo.imageId),
-                    contentDescription = categoryTwo.name
-                )
+            Spacer(modifier = Modifier.width(50.dp))
+
+            Box(
+                Modifier
+                    .padding(start = 6.dp)
+            ) {
+                CostumShadowBox(
+                    Modifier
+                        .height(180.dp)
+                        .width(180.dp),
+                    elevation = 6.dp,
+                    shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+                    cornerRadius = 20.dp,
+                    shadowColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Image(
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable(onClick = {
+                                /* navController.navigate(
+                                     Details.route.replace(
+                                         "{id}",
+                                         category
+                                     )
+
+                                )*/
+                            }),
+                        painter = painterResource(id = categoryTwo.imageId),
+                        contentDescription = categoryTwo.name
+                    )
+                }
                 TextWithShadow(
                     text = categoryTwo.name,
                     fontSize = 16.sp
@@ -308,5 +352,4 @@ object Categories : AppRouteTab, AppRouteContent {
             }
         }
     }
-
-  }
+}
