@@ -137,6 +137,8 @@ object Home : AppRouteTab, AppRouteContent {
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
             viewModel?.let { viewModel ->
 
+                val withAlcoholic by viewModel.withAlcoholic.collectAsState()
+
                 Box {
                     CostumTopBarBackground()
                     TopAppBar(
@@ -153,7 +155,7 @@ object Home : AppRouteTab, AppRouteContent {
                         actions = {
 
                             Text(
-                                text = if (viewModel.withAlcoholic) {
+                                text = if (withAlcoholic) {
                                     stringResource(R.string.label_with_alcohol)
                                 } else {
                                     stringResource(R.string.label_without_alcohol)
@@ -164,7 +166,7 @@ object Home : AppRouteTab, AppRouteContent {
                             )
                             Spacer(Modifier.width(10.dp))
                             Switch(
-                                checked = viewModel.withAlcoholic,
+                                checked = withAlcoholic,
                                 onCheckedChange = viewModel::setCocktailType
                             )
                         }
