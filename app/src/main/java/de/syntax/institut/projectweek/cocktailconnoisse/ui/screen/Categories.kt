@@ -6,15 +6,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -27,13 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
-import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
@@ -43,11 +48,11 @@ import de.schinke.steffen.interfaces.AppRouteSheet
 import de.schinke.steffen.interfaces.AppRouteTab
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
-import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoriesViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -146,61 +151,162 @@ object Categories : AppRouteTab, AppRouteContent {
         }
 
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
-        get() = { _, _, _ ->
+        get() = null
 
-            CostumShadowBox(
-                modifier = Modifier
-                    .width(56.dp),
-                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                shadowColor = MaterialTheme.colorScheme.secondary,
-                elevation = 6.dp,
-                cornerRadius = 12.dp,
-                borderSize = 0.dp
-            ) {
-                FloatingActionButton(
-                    onClick = {  },
-                    elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(0.dp)
-                ) {
-                    Icon(painterResource(id = R.drawable.ic_filter_list), "Filter")
-                }
-            }
-        }
 
     @Composable
     private fun Content(navController: NavHostController, categories: List<Category>) {
-
         Column(Modifier.fillMaxSize()) {
 
             Log.d("Categories", "categories: $categories")
 
-            LazyColumn {
+            LazyColumn(
 
-                items(categories) {
+            ) {
 
-
-                    Log.d("Cocktails", "category item: $it")
-                    Column {
-                        Image(
-                            modifier = Modifier
-                                .clickable(onClick = {
-                                    navController.navigate(
-                                        Details.route.replace(
-                                            "{category_type}",
-                                            it.toUrlArgument()
-                                        )
-                                    )
-                                }),
-                            painter = painterResource(id = it.imageId),
-                            contentDescription = it.name
-                        )
-
-                        Text(
-                            text = it.name,
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
+                item {
+                    OneItem(
+                        category = categories[0],
+                        navController = navController
+                    )
                 }
+                item {
+                    TwoItems(
+                        categoryOne = categories[1],
+                        categoryTwo = categories[2],
+                        navController = navController
+                    )
+                }
+                item {
+                    OneItem(
+                        category = categories[3],
+                        navController = navController
+                    )
+                }
+                item {
+                    TwoItems(
+                        categoryOne = categories[4],
+                        categoryTwo = categories[5],
+                        navController = navController
+                    )
+                }
+                item {
+                    OneItem(
+                        category = categories[6],
+                        navController = navController
+                    )
+                }
+                item {
+                    TwoItems(
+                        categoryOne = categories[7],
+                        categoryTwo = categories[8],
+                        navController = navController
+                    )
+                }
+                item {
+                    OneItem(
+                        category = categories[9],
+                        navController = navController
+                    )
+                }
+                item {
+                    OneItem(
+                        category = categories[10],
+                        navController = navController
+                    )
+                }
+            }
+
+
+        }
+    }
+
+
+    @Composable
+    private fun OneItem(category: Category, navController: NavHostController) {
+
+        Box {
+            Image(
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .fillMaxWidth()
+                    .clickable(onClick = {
+                        /*navController.navigate(
+                            Details.route.replace(
+                                "{id}",
+                                category
+                            )
+
+                        )*/
+                    }),
+                painter = painterResource(id = category.imageId),
+                contentDescription = category.name
+            )
+            TextWithShadow(
+                text = category.name,
+                fontSize = 16.sp
+            )
+        }
+    }
+
+    @Composable
+    fun TwoItems(categoryOne: Category, categoryTwo: Category, navController: NavHostController) {
+        Row {
+            Box {
+                Image(
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable(onClick = {
+                            /*
+                            navController.navigate(
+
+                                Details.route.replace(
+                                    "{id}",
+                                    category
+                                )
+                        )*/
+                        }),
+                    painter = painterResource(id = categoryOne.imageId),
+                    contentDescription = categoryOne.name
+                )
+                TextWithShadow(
+                    text = categoryOne.name,
+                    fontSize = 16.sp
+                )
+
+            }
+            Spacer(
+                modifier = Modifier
+                    .width(10.dp)
+            )
+            Box {
+                Image(
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(200.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable(onClick = {
+                            /* navController.navigate(
+                                 Details.route.replace(
+                                     "{id}",
+                                     category
+                                 )
+
+                            )*/
+                        }),
+                    painter = painterResource(id = categoryTwo.imageId),
+                    contentDescription = categoryTwo.name
+                )
+                TextWithShadow(
+                    text = categoryTwo.name,
+                    fontSize = 16.sp
+                )
             }
         }
     }
-}
+
+  }
