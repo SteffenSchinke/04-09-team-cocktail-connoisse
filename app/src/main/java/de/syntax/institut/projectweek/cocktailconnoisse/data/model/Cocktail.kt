@@ -1,13 +1,10 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.model
 
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
-import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Entity(tableName = "cocktail")
 data class Cocktail(

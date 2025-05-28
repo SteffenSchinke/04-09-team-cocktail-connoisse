@@ -200,7 +200,7 @@ object Home : AppRouteTab, AppRouteContent {
         get() = null
 
     @Composable
-    internal fun Content(
+    private fun Content(
 
         navController: NavHostController,
         cocktail: Cocktail,
