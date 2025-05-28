@@ -19,6 +19,7 @@ data class Cocktail(
     val instructions: String?,
     val imageUrl: String,
     var favorited: Boolean = false,
+    val isAlcoholic: Boolean,
     val modifiedAt: String?,
     @ColumnInfo(name = "createdAt", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: String

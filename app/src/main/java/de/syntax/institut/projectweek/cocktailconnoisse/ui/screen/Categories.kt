@@ -1,9 +1,5 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
-import android.R.attr.bottom
-import android.R.attr.contentDescription
-import android.R.attr.shadowColor
-import android.R.attr.text
 import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -16,10 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
@@ -33,6 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -44,9 +40,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImagePainter.State.Empty.painter
 import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
@@ -96,11 +94,44 @@ object Categories : AppRouteTab, AppRouteContent {
                 val viewModelState by viewModel.state.collectAsState()
                 val apiError by viewModel.apiError.collectAsState()
                 val categories by viewModel.categories.collectAsState()
+                val hasNavigated by viewModel.hasNavigated.collectAsState()
+                val cocktailsByCategory by viewModel.cocktailsByCategory.collectAsState()
+                val lifecycleOwner = LocalLifecycleOwner.current
+
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            viewModel.resetNavigationFlag()
+                        }
+                    }
+
+                    val lifecycle = lifecycleOwner.lifecycle
+                    lifecycle.addObserver(observer)
+
+                    onDispose {
+                        lifecycle.removeObserver(observer)
+                    }
+                }
+
+                LaunchedEffect(cocktailsByCategory, hasNavigated) {
+                    if (cocktailsByCategory.isNotEmpty() && !hasNavigated) {
+                        val route = Cocktails.route
+                            .replace(
+                                "{ids}", cocktailsByCategory
+                                    .shuffled()
+                                    .take(30)
+                                    .joinToString(",") { it.id.toString() })
+                            .replace("{top_bar_title}", viewModel.navigatedCategory.value)
+
+                        navController.navigate(route)
+                        viewModel.setNavigationFlag()
+                    }
+                }
 
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, categories)
+                        Content(viewModel, categories)
                     }
 
                     ViewModelState.WORKING -> {
@@ -165,7 +196,7 @@ object Categories : AppRouteTab, AppRouteContent {
 
 
     @Composable
-    private fun Content(navController: NavHostController, categories: List<Category>) {
+    private fun Content(viewModel: CategoriesViewModel, categories: List<Category>) {
         Column(Modifier.fillMaxSize()) {
 
             Log.d("Categories", "categories: $categories")
@@ -174,52 +205,52 @@ object Categories : AppRouteTab, AppRouteContent {
                 item {
                     OneItem(
                         category = categories[0],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     TwoItems(
                         categoryOne = categories[1],
                         categoryTwo = categories[2],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     OneItem(
                         category = categories[3],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     TwoItems(
                         categoryOne = categories[4],
                         categoryTwo = categories[5],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     OneItem(
                         category = categories[6],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     TwoItems(
                         categoryOne = categories[7],
                         categoryTwo = categories[8],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     OneItem(
                         category = categories[9],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
                 item {
                     OneItem(
                         category = categories[10],
-                        navController = navController
+                        viewModel = viewModel
                     )
                 }
             }
@@ -228,7 +259,7 @@ object Categories : AppRouteTab, AppRouteContent {
 
 
     @Composable
-    private fun OneItem(category: Category, navController: NavHostController) {
+    private fun OneItem(category: Category, viewModel: CategoriesViewModel) {
 
         Box(
             modifier = Modifier
@@ -249,13 +280,7 @@ object Categories : AppRouteTab, AppRouteContent {
                         .clip(RoundedCornerShape(20.dp))
                         .fillMaxWidth()
                         .clickable(onClick = {
-                            /*navController.navigate(
-                            Details.route.replace(
-                                "{id}",
-                                category
-                            )
-
-                        )*/
+                            viewModel.loadCocktailsFromCategory(category)
                         }),
                     painter = painterResource(id = category.imageId),
                     contentDescription = category.name
@@ -269,7 +294,7 @@ object Categories : AppRouteTab, AppRouteContent {
     }
 
     @Composable
-    fun TwoItems(categoryOne: Category, categoryTwo: Category, navController: NavHostController) {
+    fun TwoItems(categoryOne: Category, categoryTwo: Category, viewModel: CategoriesViewModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -293,13 +318,7 @@ object Categories : AppRouteTab, AppRouteContent {
                             .fillMaxSize()
                             .clip(RoundedCornerShape(20.dp))
                             .clickable(onClick = {
-                                /* navController.navigate(
-                                     Details.route.replace(
-                                         "{id}",
-                                         category
-                                     )
-
-                                )*/
+                                viewModel.loadCocktailsFromCategory(categoryOne)
                             }),
                         painter = painterResource(id = categoryOne.imageId),
                         contentDescription = categoryOne.name
@@ -332,13 +351,7 @@ object Categories : AppRouteTab, AppRouteContent {
                             .fillMaxSize()
                             .clip(RoundedCornerShape(20.dp))
                             .clickable(onClick = {
-                                /* navController.navigate(
-                                     Details.route.replace(
-                                         "{id}",
-                                         category
-                                     )
-
-                                )*/
+                                viewModel.loadCocktailsFromCategory(categoryTwo)
                             }),
 
                         painter = painterResource(id = categoryTwo.imageId),

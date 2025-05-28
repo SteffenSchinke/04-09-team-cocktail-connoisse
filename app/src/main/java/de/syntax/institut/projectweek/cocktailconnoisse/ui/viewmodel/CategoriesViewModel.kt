@@ -7,6 +7,7 @@ import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,14 +18,20 @@ class CategoriesViewModel(
     private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
-    // TODO sts 23.05.25 - implement viewmodel with filtering
-
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories
 
     private val _apiError = MutableStateFlow<ApiError?>(null)
     val apiError: StateFlow<ApiError?> = _apiError
 
+    private val _cocktailsByCategory = MutableStateFlow<List<Cocktail>>(emptyList())
+    val cocktailsByCategory: StateFlow<List<Cocktail>> = _cocktailsByCategory
+
+    private val _hasNavigated = MutableStateFlow(false)
+    val hasNavigated: StateFlow<Boolean> = _hasNavigated
+
+    private val _navigatedCategory = MutableStateFlow("")
+    val navigatedCategory: StateFlow<String> = _navigatedCategory
 
     init {
 
@@ -51,5 +58,35 @@ class CategoriesViewModel(
         }
     }
 
+    fun loadCocktailsFromCategory(category: Category) {
+
+        setState { ViewModelState.WORKING }
+
+        viewModelScope.launch {
+            try {
+
+                val urlArgument = category.toUrlArgument()
+                cocktailRepo.getCocktailsByCategory(urlArgument).collect { cocktails ->
+                    _cocktailsByCategory.value = cocktails
+                    _navigatedCategory.value = category.name
+                }
+
+                setState { ViewModelState.READY }
+            } catch (e: ApiError) {
+
+                _apiError.value = e
+                setState { ViewModelState.ERROR }
+            }
+        }
+    }
+
     fun resetApiError() { _apiError.value = null }
+
+    fun setNavigationFlag() { _hasNavigated.value = true }
+
+    fun resetNavigationFlag() {
+        _hasNavigated.value = false
+        _cocktailsByCategory.value = emptyList()
+        _navigatedCategory.value = ""
+    }
 }

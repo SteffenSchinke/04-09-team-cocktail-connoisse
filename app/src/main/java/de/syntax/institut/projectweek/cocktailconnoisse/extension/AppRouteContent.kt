@@ -14,5 +14,5 @@ fun AppRouteContent.getStringResourceByName(
 
     val context = LocalContext.current
     val resId = context.resources.getIdentifier(key, "string", context.packageName)
-    return if (resId != 0) context.getString(resId) else "[$key]"
+    return if (resId != 0) context.getString(resId) else key
 }
