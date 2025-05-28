@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -276,7 +277,6 @@ object Categories : AppRouteTab, AppRouteContent {
         {
             Box(Modifier
                 .padding(start = 6.dp)
-
             ) {
                 CostumShadowBox(
                     Modifier
@@ -331,7 +331,6 @@ object Categories : AppRouteTab, AppRouteContent {
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(20.dp))
-
                             .clickable(onClick = {
                                 /* navController.navigate(
                                      Details.route.replace(
