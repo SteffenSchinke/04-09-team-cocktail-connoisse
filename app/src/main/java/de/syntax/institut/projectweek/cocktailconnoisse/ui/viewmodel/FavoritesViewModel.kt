@@ -6,6 +6,7 @@ import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiErrorType
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,4 +44,10 @@ class FavoritesViewModel(
         )
 
     fun resetApiError() { _apiError.value = null }
+
+    fun updateIsFavorited(cocktail: Cocktail) {
+
+        //val newCocktail = cocktail.copy(favorited != cocktail.favorited)
+        //cocktailRepo.
+    }
 }
