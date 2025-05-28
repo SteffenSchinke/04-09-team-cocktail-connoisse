@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -300,13 +301,14 @@ object Categories : AppRouteTab, AppRouteContent {
                 .padding(bottom = 20.dp))
         {
             Box(Modifier
+                .weight(1f)
                 .padding(start = 6.dp)
 
             ) {
                 CostumShadowBox(
                     Modifier
-                        .height(180.dp)
-                        .width(180.dp),
+                        .aspectRatio(1f)
+                        .fillMaxWidth(),
                         elevation = 6.dp,
                     shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
                     cornerRadius = 20.dp,
@@ -330,16 +332,17 @@ object Categories : AppRouteTab, AppRouteContent {
                 )
             }
 
-            Spacer(modifier = Modifier.width(40.dp))
+            Spacer(modifier = Modifier.width(30.dp))
 
             Box(
                 Modifier
+                    .weight(1f)
                     .padding(start = 6.dp)
             ) {
                 CostumShadowBox(
                     Modifier
-                        .height(180.dp)
-                        .width(180.dp),
+                        .aspectRatio(1f)
+                        .fillMaxWidth(),
                     elevation = 6.dp,
                     shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
                     cornerRadius = 20.dp,
