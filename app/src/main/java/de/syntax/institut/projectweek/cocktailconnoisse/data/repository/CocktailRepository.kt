@@ -26,6 +26,34 @@ class CocktailRepository(
         cocktailCount == 0 && ingredientCount == 0
     }
 
+    override fun getAllFavorites(): Flow<List<Cocktail>> = flow {
+        try {
+
+            cocktailDao.getAllFavorites().collect{ cocktails ->
+                if (cocktails.isEmpty()) {
+                    throw ApiError(
+                        type = ApiErrorType.PERSISTENCE_FAILED,
+                        innerMessage = "api_error_response"
+                    )
+                }
+                val favorites = cocktails.map {
+                    it.cocktail.apply { ingredients = it.ingredients }
+                }
+                emit(favorites)
+            }
+
+        } catch (e: ApiError) {
+
+            throw e
+        } catch (e: Exception) {
+
+            throw ApiError(
+                type = ApiErrorType.PERSISTENCE_FAILED,
+                innerMessage = e.localizedMessage,
+            )
+        }
+    }
+
     override fun getRandomCocktail(): Flow<Cocktail?> = flow {
 
         try {
@@ -133,7 +161,6 @@ class CocktailRepository(
             )
         }
     }
-
 
 
     override fun getCocktailsByName(name: String): Flow<List<Cocktail>> = flow {
@@ -286,7 +313,8 @@ class CocktailRepository(
                     innerMessage = "api_error_persistence"
                 )
 
-                val cocktail = cocktailNotNull.cocktail.apply { ingredients = cocktailNotNull.ingredients }
+                val cocktail =
+                    cocktailNotNull.cocktail.apply { ingredients = cocktailNotNull.ingredients }
 
                 emit(cocktail)
             }

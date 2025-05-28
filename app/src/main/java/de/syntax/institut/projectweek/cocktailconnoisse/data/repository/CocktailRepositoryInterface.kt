@@ -30,6 +30,8 @@ interface CocktailRepositoryInterface {
 
     suspend fun updateCachedCocktail(cocktail: Cocktail)
 
+    fun getAllFavorites(): Flow<List<Cocktail>>
+
     suspend fun truncateCache()
 
     fun isCacheEmpty(): Flow<Boolean>
