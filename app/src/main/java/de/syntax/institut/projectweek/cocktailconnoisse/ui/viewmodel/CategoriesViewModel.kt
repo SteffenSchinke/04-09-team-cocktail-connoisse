@@ -10,7 +10,9 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+
 
 class CategoriesViewModel(
 
@@ -32,6 +34,9 @@ class CategoriesViewModel(
 
     private val _navigatedCategory = MutableStateFlow("")
     val navigatedCategory: StateFlow<String> = _navigatedCategory
+
+    private val _cocktails = MutableStateFlow<List<Cocktail>>(emptyList())
+    val cocktails: StateFlow<List<Cocktail>> = _cocktails
 
     init {
 
@@ -88,5 +93,16 @@ class CategoriesViewModel(
         _hasNavigated.value = false
         _cocktailsByCategory.value = emptyList()
         _navigatedCategory.value = ""
+    }
+
+
+    fun loadCocktailsByIngredient(ingredient: String) {
+        viewModelScope.launch {
+            cocktailRepo.getCocktailsByIngredient(ingredient)
+                .catch { e -> e.printStackTrace() }
+                .collect { cocktails ->
+                    _cocktails.value = cocktails
+                }
+        }
     }
 }

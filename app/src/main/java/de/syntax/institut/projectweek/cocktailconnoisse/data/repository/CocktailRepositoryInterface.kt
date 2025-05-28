@@ -19,6 +19,8 @@ interface CocktailRepositoryInterface {
 
     fun getCocktailsByCategory(category: String): Flow<List<Cocktail>>
 
+    fun getCocktailsByIngredient(ingredient: String): Flow<List<Cocktail>>
+
 
     suspend fun insertCachedCocktailWithIngredients(cocktail: Cocktail, ingredients: List<Ingredient>)
 

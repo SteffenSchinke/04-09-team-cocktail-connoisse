@@ -1,9 +1,9 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
-import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiErrorType
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.CocktailDto
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.toDomain
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CocktailDao
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
@@ -293,6 +293,9 @@ class CocktailRepository(
         }
     }
 
+
+
+
     override suspend fun insertCachedCocktailWithIngredients(
         cocktail: Cocktail,
         ingredients: List<Ingredient>
@@ -370,4 +373,70 @@ class CocktailRepository(
         cocktailDao.truncateCache()
     }
 
+    override fun getCocktailsByIngredient(ingredient: String): Flow<List<Cocktail>> = flow {
+        val response = api.apiCocktailService.getCocktailsByIngredient(ingredient)
+
+        if (response.isSuccessful) {
+            val shortCocktails = response.body()?.cocktails ?: emptyList()
+            val detailedCocktails = mutableListOf<Cocktail>()
+
+            shortCocktails.forEach { shortDto ->
+                val detailResponse = api.apiCocktailService.getCocktailById(shortDto.id)
+                if (detailResponse.isSuccessful) {
+                    val detailDto = detailResponse.body()?.cocktails?.firstOrNull()
+                    if (detailDto != null) {
+                        val cocktail = Cocktail(
+                            id = detailDto.id.toLongOrNull() ?: 0L,
+                            name = detailDto.name ?: "",
+                            category = detailDto.category ?: "",
+                            instructions = detailDto.instructions ?: "",
+                            imageUrl = detailDto.imageUrl ?: "",
+                            favorited = false,
+                            isAlcoholic = detailDto.alcoholic?.contains("Alcoholic") == true,
+                            modifiedAt = detailDto.modifiedAt,
+                            createdAt = "",
+                        ).apply {
+                            ingredients = buildIngredientsList(detailDto)
+                        }
+                        detailedCocktails.add(cocktail)
+                    }
+                }
+            }
+
+            emit(detailedCocktails)
+        } else {
+            emit(emptyList())
+        }
+    }
+
+}
+
+fun buildIngredientsList(dto: CocktailDto): List<Ingredient> {
+    val ingredients = mutableListOf<Ingredient>()
+
+    val ingredientNames = listOf(
+        dto.ingredient1, dto.ingredient2, dto.ingredient3, dto.ingredient4, dto.ingredient5,
+        dto.ingredient6, dto.ingredient7, dto.ingredient8, dto.ingredient9, dto.ingredient10,
+        dto.ingredient11, dto.ingredient12, dto.ingredient13, dto.ingredient14, dto.ingredient15
+    )
+
+    val measures = listOf(
+        dto.measure1, dto.measure2, dto.measure3, dto.measure4, dto.measure5,
+        dto.measure6, dto.measure7, dto.measure8, dto.measure9
+    )
+
+    ingredientNames.forEachIndexed { index, name ->
+        if (!name.isNullOrEmpty()) {
+            ingredients.add(
+                Ingredient(
+                    id = 0L,
+                    cocktailId = dto.id.toLongOrNull() ?: 0L,
+                    name = name,
+                    measure = measures.getOrNull(index)
+                )
+            )
+        }
+    }
+
+    return ingredients
 }

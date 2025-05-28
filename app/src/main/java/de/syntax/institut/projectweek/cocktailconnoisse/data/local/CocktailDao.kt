@@ -64,4 +64,13 @@ interface CocktailDao {
         clearCachedIngredients()
         clearCachedCocktails()
     }
+
+    @Transaction
+    @Query("SELECT * FROM cocktail WHERE id = :cocktailId")
+    suspend fun getCocktailWithIngredients(cocktailId: Long): CocktailWithIngredients
+
+    @Transaction
+    @Query("SELECT * FROM cocktail")
+    suspend fun getAllCocktailsWithIngredients(): List<CocktailWithIngredients>
+
 }
