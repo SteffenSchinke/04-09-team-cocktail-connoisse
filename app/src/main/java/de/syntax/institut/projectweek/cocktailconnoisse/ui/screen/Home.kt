@@ -8,21 +8,27 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -32,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,12 +59,14 @@ import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemWithoutTitle
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
+
 
 object Home : AppRouteTab, AppRouteContent {
 
@@ -77,6 +86,8 @@ object Home : AppRouteTab, AppRouteContent {
             SettingsViewModel::class to { koinViewModel<SettingsViewModel>() }
         )
 
+
+
     @OptIn(ExperimentalMaterial3Api::class)
     override val content: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, SheetState, Bundle?, (AppRouteSheet, Bundle?) -> Unit, () -> Unit) -> Unit)?
         get() = { viewModelMap, navController, _, _, _, _ ->
@@ -89,8 +100,9 @@ object Home : AppRouteTab, AppRouteContent {
                 val apiError by viewModelHome.apiError.collectAsState()
                 val cocktail = viewModelHome.randomCocktail.collectAsState().value
                 val cocktails = viewModelHome.randomCocktails.collectAsState().value
+                val updatedCocktail = viewModelHome.updatedCocktail.collectAsState()
 
-                LaunchedEffect(Unit) {
+                LaunchedEffect(Unit, updatedCocktail) {
 
                     if (viewModelState == ViewModelState.READY) {
 
@@ -102,8 +114,8 @@ object Home : AppRouteTab, AppRouteContent {
 
                     ViewModelState.READY -> {
 
-                        cocktail?.let { cocktail ->
-                            Content(navController, cocktail, cocktails)
+                        cocktail?.let {
+                            Content(navController, it, cocktails, viewModelHome)
                         }
                     }
 
@@ -135,9 +147,10 @@ object Home : AppRouteTab, AppRouteContent {
 
             val viewModel =
                 viewModelMap.getOrDefault(HomeViewModel::class, null) as HomeViewModel?
-            viewModel?.let { viewModel ->
+            viewModel?.let { viewModelHome ->
 
-                val withAlcoholic by viewModel.withAlcoholic.collectAsState()
+                val withAlcoholic = viewModelHome.withAlcoholic.collectAsState().value
+
 
                 Box {
                     CostumTopBarBackground()
@@ -167,8 +180,16 @@ object Home : AppRouteTab, AppRouteContent {
                             Spacer(Modifier.width(10.dp))
                             Switch(
                                 checked = withAlcoholic,
-                                onCheckedChange = viewModel::setCocktailType
+                                onCheckedChange = {
+                                    viewModelHome.setCocktailType(it)
+                                    if (viewModelHome.searchText.isNotBlank()) {
+                                        viewModelHome.searchCocktailsByName(viewModelHome.searchText)
+                                    }
+                                }
                             )
+                            IconButton(onClick = { viewModel.isSearching = !viewModel.isSearching }) {
+                                Icon(Icons.Default.Search, contentDescription = "Suche", tint = MaterialTheme.colorScheme.onPrimary)
+                            }
                         }
                     )
                 }
@@ -183,21 +204,78 @@ object Home : AppRouteTab, AppRouteContent {
 
         navController: NavHostController,
         cocktail: Cocktail,
-        cocktails: List<Cocktail>
+        cocktails: List<Cocktail>,
+        homeViewModel: HomeViewModel
     ) {
-
+        val withAlcoholic by homeViewModel.withAlcoholic.collectAsState()
         Column {
+            if (homeViewModel.isSearching) {
+                Column {
+                    TextField(
+                        value = homeViewModel.searchText,
+                        onValueChange = {
+                            homeViewModel.searchText = it
+                            homeViewModel.searchCocktailsByName(it)
+                        },
+                        placeholder = { Text("Suche...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    Button(
+                        onClick = {
+                            homeViewModel.isSearching = false
+                            homeViewModel.searchText = ""
+                            homeViewModel.searchedCocktails.value = emptyList()
+                        },
+                        modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
+                    ) {
+                        Text("Schließen")
+                    }
+                }
+                if (homeViewModel.searchText.isNotBlank()) {
+                    if (homeViewModel.searchedCocktails.value.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val typeText = if (withAlcoholic) "mit Alkohol" else "ohne Alkohol"
+                            Text(
+                                text = "Keine Cocktails $typeText unter dem Namen \"${homeViewModel.searchText}\" gefunden",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    } else {
+                        LazyColumn {
+                            items(homeViewModel.searchedCocktails.value.filter { cocktail ->
+                                if (homeViewModel.withAlcoholic.value) {
+                                    cocktail.isAlcoholic
+                                } else {
+                                    !cocktail.isAlcoholic
+                                }
+                            }) { cocktail ->
+                                CocktailItemWithoutTitle(cocktail, navController, homeViewModel)
+                            }
+                        }
+                    }
+                } else {
+                    CocktailItem(cocktail, navController, homeViewModel)
 
-            CocktailItem(cocktail, navController)
+                    Spacer(Modifier.height(10.dp))
 
-            Spacer(Modifier.height(20.dp))
+                    CocktailList(cocktails, navController, homeViewModel)
+                }
+            } else {
+                CocktailItem(cocktail, navController, homeViewModel)
 
-            CocktailList(cocktails, navController)
+                Spacer(Modifier.height(10.dp))
+
+                CocktailList(cocktails, navController, homeViewModel)
+            }
         }
     }
 
     @Composable
-    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController) {
+    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController, viewModel: HomeViewModel) {
 
         Text(
             text = stringResource(R.string.label_home_title1),
@@ -209,24 +287,49 @@ object Home : AppRouteTab, AppRouteContent {
         Box(
             Modifier.fillMaxWidth().padding(start = 6.dp)
         ) {
-
             CostumShadowBox(
                 elevation = 6.dp,
                 shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
                 cornerRadius = 12.dp,
                 shadowColor = MaterialTheme.colorScheme.secondary
             ) {
-                CostumAsyncImage(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .clickable {
-                            navController.navigate(
-                                Details.route.replace("{id}", cocktail.id.toString())
-                            )
+                Box {
+                    CostumAsyncImage(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .clickable {
+                                navController.navigate(
+                                    Details.route.replace("{id}", cocktail.id.toString())
+                                )
+                            },
+                        url = cocktail.imageUrl
+                    )
+                    IconButton(
+                        onClick = {
+                            viewModel.updateFavorite(cocktail)
                         },
-                    url = cocktail.imageUrl
-                )
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                    ) {
+                        IconButton(
+                            onClick = { viewModel.updateFavorite(cocktail) },
+                            content = {
+                                if (cocktail.favorited)
+                                    Icon(
+                                        painterResource(R.drawable.ic_favorite_on),
+                                        "Favorite On"
+                                    )
+                                else
+                                    Icon(
+                                        painterResource(R.drawable.ic_favorite_off),
+                                        "Favorite Off"
+                                    )
+                            }
+                        )
+                    }
+                }
             }
 
             TextWithShadow(
@@ -234,12 +337,10 @@ object Home : AppRouteTab, AppRouteContent {
                 fontSize = 16.sp
             )
         }
-
-        Spacer(Modifier.height(20.dp))
     }
 
     @Composable
-    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController) {
+    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController, viewModel: HomeViewModel) {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -284,20 +385,41 @@ object Home : AppRouteTab, AppRouteContent {
                         shadowColor = MaterialTheme.colorScheme.secondary
                     ) {
 
-                        CostumAsyncImage(
-                            modifier = Modifier
-                                .width(250.dp)
-                                .height(250.dp)
-                                .clickable {
-                                    navController.navigate(
-                                        Details.route.replace(
-                                            "{id}",
-                                            cocktailItem.id.toString()
+                        Box {
+                            CostumAsyncImage(
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .height(250.dp)
+                                    .clickable {
+                                        navController.navigate(
+                                            Details.route.replace(
+                                                "{id}",
+                                                cocktailItem.id.toString()
+                                            )
                                         )
-                                    )
+                                    },
+                                url = cocktailItem.imageUrl
+                            )
+
+                            IconButton(
+                                onClick = {
+                                    viewModel.updateFavorite(cocktailItem)
                                 },
-                            url = cocktailItem.imageUrl
-                        )
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(8.dp)
+                            ) {
+                                IconButton(
+                                    onClick = { viewModel.updateFavorite(cocktailItem)},
+                                    content = {
+                                        if (cocktailItem.favorited)
+                                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                                        else
+                                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                                    }
+                                )
+                            }
+                        }
                     }
 
                     TextWithShadow(

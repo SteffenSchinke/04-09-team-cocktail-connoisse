@@ -1,5 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
+import de.schinke.steffen.enums.ViewModelState
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiErrorType
@@ -9,6 +10,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -26,6 +28,59 @@ class CocktailRepository(
     ) { cocktailCount, ingredientCount ->
         cocktailCount == 0 && ingredientCount == 0
     }
+
+//    override fun getAllFavorites(): Flow<List<Cocktail>> = flow {
+//        try {
+//
+//            cocktailDao.getAllFavorites().collect{ cocktails ->
+//                if (cocktails.isEmpty()) {
+//                    throw ApiError(
+//                        type = ApiErrorType.PERSISTENCE_FAILED,
+//                        innerMessage = "api_error_response"
+//                    )
+//                }
+//                val favorites = cocktails.map {
+//                    it.cocktail.apply { ingredients = it.ingredients }
+//                }
+//                emit(favorites)
+//            }
+//
+//        } catch (e: ApiError) {
+//
+//            throw e
+//        } catch (e: Exception) {
+//
+//            throw ApiError(
+//                type = ApiErrorType.PERSISTENCE_FAILED,
+//                innerMessage = e.localizedMessage,
+//            )
+//        }
+//    }
+
+    override fun getAllFavorites(): Flow<List<Cocktail>> =
+        cocktailDao.getAllFavorites()
+            .map { cocktails ->
+                if (cocktails.isEmpty()) {
+                    throw ApiError(
+                        type = ApiErrorType.PERSISTENCE_FAILED,
+                        innerMessage = "api_error_response"
+                    )
+                }
+                cocktails.map {
+                    it.cocktail.apply { ingredients = it.ingredients }
+                }
+            }
+            .catch { e ->
+                when (e) {
+                    is ApiError -> {
+                        ApiError(
+                            type = ApiErrorType.PERSISTENCE_FAILED,
+                            innerMessage = e.localizedMessage ?: "api_error_unknown"
+                        )
+                    }
+                    else -> throw e
+                }
+            }
 
     override fun getRandomCocktail(): Flow<Cocktail?> = flow {
 
@@ -136,7 +191,6 @@ class CocktailRepository(
     }
 
 
-
     override fun getCocktailsByName(name: String): Flow<List<Cocktail>> = flow {
 
         try {
@@ -199,6 +253,46 @@ class CocktailRepository(
         }
     }
 
+    override fun getCocktailsByCategory(category: String): Flow<List<Cocktail>> = flow {
+
+        try {
+
+            val response = api.apiCocktailService.getCocktailsByCategory(category)
+
+            if (!response.isSuccessful) {
+                throw ApiError(
+                    type = ApiErrorType.RESPONSE_FAILED,
+                    responseCode = response.code(),
+                    innerMessage = "api_error_response"
+                )
+            }
+
+            val dtoResponse = response.body()?.cocktails ?: throw ApiError(
+                type = ApiErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
+            )
+
+            val listCocktail: MutableList<Cocktail> = mutableListOf()
+            dtoResponse.map { it ->
+
+                val cocktail = it.toDomain()
+
+                cocktailDao.insertCachedCocktailWithIngredients(cocktail, cocktail.ingredients)
+
+                listCocktail.add(cocktail)
+            }
+            emit(listCocktail)
+        } catch (e: ApiError) {
+
+            throw e
+        } catch (e: Exception) {
+
+            throw ApiError(
+                type = ApiErrorType.RESPONSE_FAILED,
+                innerMessage = e.localizedMessage,
+            )
+        }
+    }
+
     override suspend fun insertCachedCocktailWithIngredients(
         cocktail: Cocktail,
         ingredients: List<Ingredient>
@@ -209,8 +303,8 @@ class CocktailRepository(
 
     override fun getCachedCocktails(): Flow<List<Cocktail>> = flow {
 
-        try {
-
+        try
+        {
             cocktailDao.getCachedCocktails().collect { cocktailWithIngredients ->
                 if (cocktailWithIngredients.isEmpty()) {
                     throw ApiError(
@@ -247,7 +341,8 @@ class CocktailRepository(
                     innerMessage = "api_error_persistence"
                 )
 
-                val cocktail = cocktailNotNull.cocktail.apply { ingredients = cocktailNotNull.ingredients }
+                val cocktail =
+                    cocktailNotNull.cocktail.apply { ingredients = cocktailNotNull.ingredients }
 
                 emit(cocktail)
             }

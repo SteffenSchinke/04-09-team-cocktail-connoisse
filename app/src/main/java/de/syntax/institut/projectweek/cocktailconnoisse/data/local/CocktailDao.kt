@@ -47,6 +47,9 @@ interface CocktailDao {
     @Query("SELECT COUNT(*) FROM ingredient")
     fun getIngredientCount(): Flow<Int>
 
+    @Query("SELECT * FROM cocktail WHERE favorited = 1")
+    fun getAllFavorites(): Flow<List<CocktailWithIngredients>>
+
     @Transaction
     suspend fun insertCachedCocktailWithIngredients(
         cocktail: Cocktail,
