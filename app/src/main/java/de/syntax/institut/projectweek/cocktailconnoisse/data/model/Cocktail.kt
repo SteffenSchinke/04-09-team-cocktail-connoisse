@@ -24,6 +24,22 @@ data class Cocktail(
 
     @Ignore
     lateinit var ingredients: List<Ingredient>
+
+    companion object {
+        fun getSample(): Cocktail {
+            return Cocktail(
+                id = 0,
+                name = "Mojito",
+                category = "Cocktail",
+                instructions = "",
+                imageUrl = "",
+                favorited = false,
+                isAlcoholic = true,
+                modifiedAt = "",
+                createdAt = "",
+            ).apply { ingredients = emptyList() }
+        }
+    }
 }
 
 

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TextWithShadow(
+internal fun TextWithShadow(
     text: String,
     fontSize: TextUnit = 24.sp,
     strokeColor: Color = Color.Black,

@@ -15,7 +15,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnois
 
 
 @Composable
-fun CostumTopBarBackground() {
+internal fun CostumTopBarBackground() {
 
     val color = MaterialTheme.colorScheme.secondary
 

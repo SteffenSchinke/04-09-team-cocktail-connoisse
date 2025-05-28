@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -44,6 +46,7 @@ import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
@@ -154,14 +157,23 @@ object Details : AppRoute, AppRouteContent {
         viewModel: DetailsViewModel
     ) {
 
+        Details(viewModel)
+
+        Suggestions()
+    }
+
+
+    @Composable
+    fun Details(
+        viewModel: DetailsViewModel
+    ) {
+
         val cocktail by viewModel.cocktail.collectAsState()
         val isFavorited by viewModel.isFavorited.collectAsState()
 
         Column(Modifier.fillMaxSize()) {
 
             cocktail?.let {
-
-                Log.d("Details", "Content: $it")
 
                 Text(
                     text = it.name,
@@ -175,21 +187,20 @@ object Details : AppRoute, AppRouteContent {
                     url = it.imageUrl
                 )
 
-                IconButton(
-                    onClick = viewModel::updateIsFavorited,
-                    content = {
-                        if (isFavorited)
-                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
-                        else
-                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
-                    }
+                FavoriteSwitch(
+                    modifier = Modifier
+                        .padding(8.dp),
+                    cocktail = it,
+                    onFavoriteChange = { viewModel.updateIsFavorited(it) }
                 )
             }
-
-
-            // TODO sts 25.05.25 content implement
-
-            // TODO sts 24.05.25 - list horizontal cocktails from self type
         }
+
+    }
+
+    @Composable
+    private fun Suggestions() {
+
+
     }
 }

@@ -28,6 +28,8 @@
     <string name="label_home_title1">Empfehlung</string>">
     <string name="label_home_title2">Vorschläge</string>">
     <string name="label_home_title3">"Mehr anzeigen"</string>">
+    <string name="label_favorite_on">"Favorit ein"</string>">
+    <string name="label_favorite_off">"Favorit aus"</string>">
     <string name="label_favorites_empty">"Leider sind noch keine Favoriten in deiner Liste."</string>">
     <string name="label_search">"Suche…"</string>">
     <string name="label_close">"Schließen"</string>">

@@ -20,7 +20,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Details
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 
 @Composable
-fun CocktailItemWithoutTitle(cocktail: Cocktail, navController: NavHostController, viewModel: HomeViewModel) {
+internal fun CocktailItemWithoutTitle(cocktail: Cocktail, navController: NavHostController, viewModel: HomeViewModel) {
     Spacer(Modifier.height(20.dp))
 
     Box(

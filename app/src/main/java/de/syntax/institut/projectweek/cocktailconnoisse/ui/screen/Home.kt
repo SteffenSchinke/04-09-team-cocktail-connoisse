@@ -38,7 +38,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,8 +58,9 @@ import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemWithoutTitle
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemLarge
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
@@ -85,7 +85,6 @@ object Home : AppRouteTab, AppRouteContent {
             HomeViewModel::class to { koinViewModel<HomeViewModel>() },
             SettingsViewModel::class to { koinViewModel<SettingsViewModel>() }
         )
-
 
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -187,8 +186,14 @@ object Home : AppRouteTab, AppRouteContent {
                                     }
                                 }
                             )
-                            IconButton(onClick = { viewModel.isSearching = !viewModel.isSearching }) {
-                                Icon(Icons.Default.Search, contentDescription = "Suche", tint = MaterialTheme.colorScheme.onPrimary)
+                            IconButton(onClick = {
+                                viewModel.isSearching = !viewModel.isSearching
+                            }) {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = "Suche",
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
                             }
                         }
                     )
@@ -205,17 +210,17 @@ object Home : AppRouteTab, AppRouteContent {
         navController: NavHostController,
         cocktail: Cocktail,
         cocktails: List<Cocktail>,
-        homeViewModel: HomeViewModel
+        viewModelHome: HomeViewModel
     ) {
-        val withAlcoholic by homeViewModel.withAlcoholic.collectAsState()
+        val withAlcoholic by viewModelHome.withAlcoholic.collectAsState()
         Column {
-            if (homeViewModel.isSearching) {
+            if (viewModelHome.isSearching) {
                 Column {
                     TextField(
-                        value = homeViewModel.searchText,
+                        value = viewModelHome.searchText,
                         onValueChange = {
-                            homeViewModel.searchText = it
-                            homeViewModel.searchCocktailsByName(it)
+                            viewModelHome.searchText = it
+                            viewModelHome.searchCocktailsByName(it)
                         },
                         placeholder = { Text(stringResource(R.string.label_search)) },
                         modifier = Modifier
@@ -223,59 +228,63 @@ object Home : AppRouteTab, AppRouteContent {
                     )
                     Button(
                         onClick = {
-                            homeViewModel.isSearching = false
-                            homeViewModel.searchText = ""
-                            homeViewModel.searchedCocktails.value = emptyList()
+                            viewModelHome.isSearching = false
+                            viewModelHome.searchText = ""
+                            viewModelHome.searchedCocktails.value = emptyList()
                         },
                         modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
                     ) {
                         Text(stringResource(R.string.label_close))
                     }
                 }
-                if (homeViewModel.searchText.isNotBlank()) {
-                    if (homeViewModel.searchedCocktails.value.isEmpty()) {
+                if (viewModelHome.searchText.isNotBlank()) {
+                    if (viewModelHome.searchedCocktails.value.isEmpty()) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             val typeText = if (withAlcoholic) stringResource(R.string.label_mit_alkohol) else stringResource(R.string.label_ohne_alkohol)
                             Text(
-                                text = stringResource(R.string.label_no_cocktails_found, typeText, homeViewModel.searchText),
+                                text = stringResource(R.string.label_no_cocktails_found, typeText, viewModelHome.searchText),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
                     } else {
                         LazyColumn {
-                            items(homeViewModel.searchedCocktails.value.filter { cocktail ->
-                                if (homeViewModel.withAlcoholic.value) {
+                            items(viewModelHome.searchedCocktails.value.filter { cocktail ->
+                                if (viewModelHome.withAlcoholic.value) {
                                     cocktail.isAlcoholic
                                 } else {
                                     !cocktail.isAlcoholic
                                 }
                             }) { cocktail ->
-                                CocktailItemWithoutTitle(cocktail, navController, homeViewModel)
+                                CocktailItemLarge(cocktail, navController, { viewModelHome.updateFavorite(cocktail) })
                             }
                         }
                     }
                 } else {
-                    CocktailItem(cocktail, navController, homeViewModel)
+                    CocktailItem(cocktail, navController, viewModelHome)
 
                     Spacer(Modifier.height(10.dp))
 
-                    CocktailList(cocktails, navController, homeViewModel)
+                    CocktailList(cocktails, navController, viewModelHome)
                 }
             } else {
-                CocktailItem(cocktail, navController, homeViewModel)
+                CocktailItem(cocktail, navController, viewModelHome)
 
                 Spacer(Modifier.height(10.dp))
 
-                CocktailList(cocktails, navController, homeViewModel)
+                CocktailList(cocktails, navController, viewModelHome)
             }
         }
     }
 
     @Composable
-    private fun CocktailItem(cocktail: Cocktail, navController: NavHostController, viewModel: HomeViewModel) {
+    private fun CocktailItem(
+        cocktail: Cocktail,
+        navController: NavHostController,
+        viewModel: HomeViewModel
+    ) {
 
         Text(
             text = stringResource(R.string.label_home_title1),
@@ -285,7 +294,9 @@ object Home : AppRouteTab, AppRouteContent {
         Spacer(Modifier.height(20.dp))
 
         Box(
-            Modifier.fillMaxWidth().padding(start = 6.dp)
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 6.dp)
         ) {
             CostumShadowBox(
                 elevation = 6.dp,
@@ -305,30 +316,14 @@ object Home : AppRouteTab, AppRouteContent {
                             },
                         url = cocktail.imageUrl
                     )
-                    IconButton(
-                        onClick = {
-                            viewModel.updateFavorite(cocktail)
-                        },
+
+                    FavoriteSwitch(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                    ) {
-                        IconButton(
-                            onClick = { viewModel.updateFavorite(cocktail) },
-                            content = {
-                                if (cocktail.favorited)
-                                    Icon(
-                                        painterResource(R.drawable.ic_favorite_on),
-                                        "Favorite On"
-                                    )
-                                else
-                                    Icon(
-                                        painterResource(R.drawable.ic_favorite_off),
-                                        "Favorite Off"
-                                    )
-                            }
-                        )
-                    }
+                            .padding(8.dp),
+                        cocktail = cocktail,
+                        onFavoriteChange = { viewModel.updateFavorite(cocktail) }
+                    )
                 }
             }
 
@@ -340,7 +335,11 @@ object Home : AppRouteTab, AppRouteContent {
     }
 
     @Composable
-    private fun CocktailList(cocktails: List<Cocktail>, navController: NavHostController, viewModel: HomeViewModel) {
+    private fun CocktailList(
+        cocktails: List<Cocktail>,
+        navController: NavHostController,
+        viewModel: HomeViewModel
+    ) {
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -401,24 +400,13 @@ object Home : AppRouteTab, AppRouteContent {
                                 url = cocktailItem.imageUrl
                             )
 
-                            IconButton(
-                                onClick = {
-                                    viewModel.updateFavorite(cocktailItem)
-                                },
+                            FavoriteSwitch(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
-                                    .padding(8.dp)
-                            ) {
-                                IconButton(
-                                    onClick = { viewModel.updateFavorite(cocktailItem)},
-                                    content = {
-                                        if (cocktailItem.favorited)
-                                            Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
-                                        else
-                                            Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
-                                    }
-                                )
-                            }
+                                    .padding(8.dp),
+                                cocktail = cocktailItem,
+                                onFavoriteChange = { viewModel.updateFavorite(cocktailItem) }
+                            )
                         }
                     }
 

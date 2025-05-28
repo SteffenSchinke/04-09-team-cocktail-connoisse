@@ -54,12 +54,12 @@ class DetailsViewModel(
         }
     }
 
-    fun updateIsFavorited() {
+    fun updateIsFavorited(cocktail: Cocktail) {
 
         _cocktail.value?.let {
             viewModelScope.launch {
 
-                val newCocktail = it.copy(favorited = !it.favorited)
+                val newCocktail = cocktail.copy(favorited = !cocktail.favorited)
                 cocktailRepo.updateCachedCocktail(newCocktail)
                 _cocktail.value = newCocktail
             }

@@ -11,7 +11,7 @@ import de.schinke.steffen.ui.components.DefaultLaunch
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 
 @Composable
-fun Launch() {
+internal fun Launch() {
 
     Box {
 

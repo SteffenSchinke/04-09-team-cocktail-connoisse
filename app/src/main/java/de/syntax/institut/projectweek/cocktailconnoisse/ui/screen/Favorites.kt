@@ -52,6 +52,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -223,20 +224,12 @@ object Favorites : AppRouteTab, AppRouteContent {
                                         verticalAlignment = Alignment.Bottom,
                                     horizontalArrangement = Arrangement.End
                                 ) {
-                                    IconButton(
-                                        onClick = { viewModel.updateIsFavorited(cocktail) },
-                                        content = {
-                                            if (cocktail.favorited)
-                                                Icon(
-                                                    painterResource(R.drawable.ic_favorite_on),
-                                                    "Favorite On"
-                                                )
-                                            else
-                                                Icon(
-                                                    painterResource(R.drawable.ic_favorite_off),
-                                                    "Favorite Off"
-                                                )
-                                        }
+
+                                    FavoriteSwitch(
+                                        modifier = Modifier
+                                            .padding(8.dp),
+                                        cocktail = cocktail,
+                                        onFavoriteChange = { viewModel.updateIsFavorited(it) }
                                     )
                                 }
                             }
