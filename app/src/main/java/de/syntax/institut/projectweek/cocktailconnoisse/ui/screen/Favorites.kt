@@ -75,7 +75,7 @@ object Favorites : AppRouteTab, AppRouteContent {
 
                 val viewModelState by viewModelFavorite.state.collectAsState()
                 val apiError by viewModelFavorite.apiError.collectAsState()
-                val cocktails = viewModelFavorite.loadFavorites()
+                val cocktails = viewModelFavorite.cocktails.collectAsState()
 
                 when (viewModelState) {
 
