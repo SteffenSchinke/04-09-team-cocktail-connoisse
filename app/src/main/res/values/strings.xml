@@ -28,6 +28,7 @@
     <string name="label_home_title1">Empfehlung</string>">
     <string name="label_home_title2">Vorschläge</string>">
     <string name="label_home_title3">"Mehr anzeigen"</string>">
+    <string name="label_favorites_empty">"Leider sind noch keine Favoriten in deiner Liste."</string>">
 
     <string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
     <string name="api_error_response">Die API antwortet mit einem Fehler.</string>

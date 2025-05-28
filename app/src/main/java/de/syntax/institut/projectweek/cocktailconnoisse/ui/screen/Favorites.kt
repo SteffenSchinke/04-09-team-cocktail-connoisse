@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,9 +24,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
@@ -75,12 +78,12 @@ object Favorites : AppRouteTab, AppRouteContent {
 
                 val viewModelState by viewModelFavorite.state.collectAsState()
                 val apiError by viewModelFavorite.apiError.collectAsState()
-                val cocktails = viewModelFavorite.cocktails.collectAsState()
+                val cocktails = viewModelFavorite.cocktails.collectAsState().value
 
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, cocktails.value)
+                        Content(navController, cocktails)
                     }
 
                     ViewModelState.WORKING -> {
@@ -126,7 +129,6 @@ object Favorites : AppRouteTab, AppRouteContent {
             }
         }
 
-
     override val fab: @Composable ((Map<KClass<out ViewModel>, ViewModel>, NavHostController, (AppRouteSheet, Bundle?) -> Unit) -> Unit)?
         get() = null
 
@@ -136,56 +138,75 @@ object Favorites : AppRouteTab, AppRouteContent {
         cocktails: List<Cocktail>
     ) {
 
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
 
-            LazyVerticalGrid(
+            if (cocktails.count() == 0) {
 
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.label_favorites_empty),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            } else {
 
-                items(cocktails) { cocktail ->
+                LazyVerticalGrid(
 
-                    Box(
-                        Modifier
-                            .aspectRatio(1f)
-                            .padding(12.dp)
-                    ) {
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
 
-                        CostumShadowBox(
-                            elevation = 6.dp,
-                            shadowPositions = setOf(
-                                ShadowPosition.TOP,
-                                ShadowPosition.LEFT
-                            ),
-                            cornerRadius = 12.dp,
-                            shadowColor = MaterialTheme.colorScheme.secondary
+                    items(cocktails) { cocktail ->
+
+                        Box(
+                            Modifier
+                                .aspectRatio(1f)
+                                .padding(12.dp)
                         ) {
 
-                            CostumAsyncImage(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable {
-                                        navController.navigate(
-                                            Details.route.replace(
-                                                "{id}",
-                                                cocktail.id.toString()
+                            CostumShadowBox(
+                                elevation = 6.dp,
+                                shadowPositions = setOf(
+                                    ShadowPosition.TOP,
+                                    ShadowPosition.LEFT
+                                ),
+                                cornerRadius = 12.dp,
+                                shadowColor = MaterialTheme.colorScheme.secondary
+                            ) {
+
+                                CostumAsyncImage(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clickable {
+                                            navController.navigate(
+                                                Details.route.replace(
+                                                    "{id}",
+                                                    cocktail.id.toString()
+                                                )
                                             )
-                                        )
-                                    },
-                                url = cocktail.imageUrl
+                                        },
+                                    url = cocktail.imageUrl
+                                )
+                            }
+                            TextWithShadow(
+                                text = cocktail.name,
+                                fontSize = 16.sp
                             )
                         }
-                        TextWithShadow(
-                            text = cocktail.name,
-                            fontSize = 16.sp
-                        )
                     }
                 }
             }
