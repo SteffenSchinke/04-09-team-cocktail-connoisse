@@ -11,6 +11,7 @@ data class CocktailDto(
     @Json(name = "strCategory") val category: String?,
     @Json(name = "strInstructionsDE") val instructions: String?,
     @Json(name = "strDrinkThumb") val imageUrl: String?,
+    @Json(name = "strAlcoholic") val alcoholic: String?,
     @Json(name = "dateModified") val modifiedAt: String?,
 
     @Json(name = "strIngredient1") val ingredient1: String?,

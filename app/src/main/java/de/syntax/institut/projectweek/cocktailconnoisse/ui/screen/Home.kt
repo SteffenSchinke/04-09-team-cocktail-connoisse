@@ -8,14 +8,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +28,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -54,6 +59,7 @@ import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemWithoutTitle
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.HomeViewModel
@@ -145,6 +151,7 @@ object Home : AppRouteTab, AppRouteContent {
 
                 val withAlcoholic = viewModelHome.withAlcoholic.collectAsState().value
 
+
                 Box {
                     CostumTopBarBackground()
                     TopAppBar(
@@ -173,8 +180,16 @@ object Home : AppRouteTab, AppRouteContent {
                             Spacer(Modifier.width(10.dp))
                             Switch(
                                 checked = withAlcoholic,
-                                onCheckedChange = viewModelHome::setCocktailType
+                                onCheckedChange = {
+                                    viewModelHome.setCocktailType(it)
+                                    if (viewModelHome.searchText.isNotBlank()) {
+                                        viewModelHome.searchCocktailsByName(viewModelHome.searchText)
+                                    }
+                                }
                             )
+                            IconButton(onClick = { viewModel.isSearching = !viewModel.isSearching }) {
+                                Icon(Icons.Default.Search, contentDescription = "Suche", tint = MaterialTheme.colorScheme.onPrimary)
+                            }
                         }
                     )
                 }
@@ -192,14 +207,70 @@ object Home : AppRouteTab, AppRouteContent {
         cocktails: List<Cocktail>,
         homeViewModel: HomeViewModel
     ) {
-
+        val withAlcoholic by homeViewModel.withAlcoholic.collectAsState()
         Column {
+            if (homeViewModel.isSearching) {
+                Column {
+                    TextField(
+                        value = homeViewModel.searchText,
+                        onValueChange = {
+                            homeViewModel.searchText = it
+                            homeViewModel.searchCocktailsByName(it)
+                        },
+                        placeholder = { Text("Suche...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                    Button(
+                        onClick = {
+                            homeViewModel.isSearching = false
+                            homeViewModel.searchText = ""
+                            homeViewModel.searchedCocktails.value = emptyList()
+                        },
+                        modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
+                    ) {
+                        Text("Schließen")
+                    }
+                }
+                if (homeViewModel.searchText.isNotBlank()) {
+                    if (homeViewModel.searchedCocktails.value.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val typeText = if (withAlcoholic) "mit Alkohol" else "ohne Alkohol"
+                            Text(
+                                text = "Keine Cocktails $typeText unter dem Namen \"${homeViewModel.searchText}\" gefunden",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    } else {
+                        LazyColumn {
+                            items(homeViewModel.searchedCocktails.value.filter { cocktail ->
+                                if (homeViewModel.withAlcoholic.value) {
+                                    cocktail.isAlcoholic
+                                } else {
+                                    !cocktail.isAlcoholic
+                                }
+                            }) { cocktail ->
+                                CocktailItemWithoutTitle(cocktail, navController, homeViewModel)
+                            }
+                        }
+                    }
+                } else {
+                    CocktailItem(cocktail, navController, homeViewModel)
 
+                    Spacer(Modifier.height(10.dp))
+
+                    CocktailList(cocktails, navController, homeViewModel)
+                }
+            } else {
                 CocktailItem(cocktail, navController, homeViewModel)
 
                 Spacer(Modifier.height(10.dp))
 
                 CocktailList(cocktails, navController, homeViewModel)
+            }
         }
     }
 
@@ -243,17 +314,22 @@ object Home : AppRouteTab, AppRouteContent {
                             .padding(8.dp)
                     ) {
                         IconButton(
-                            onClick = { viewModel.updateFavorite(cocktail)},
+                            onClick = { viewModel.updateFavorite(cocktail) },
                             content = {
                                 if (cocktail.favorited)
-                                    Icon(painterResource(R.drawable.ic_favorite_on), "Favorite On")
+                                    Icon(
+                                        painterResource(R.drawable.ic_favorite_on),
+                                        "Favorite On"
+                                    )
                                 else
-                                    Icon(painterResource(R.drawable.ic_favorite_off), "Favorite Off")
+                                    Icon(
+                                        painterResource(R.drawable.ic_favorite_off),
+                                        "Favorite Off"
+                                    )
                             }
                         )
                     }
                 }
-
             }
 
             TextWithShadow(

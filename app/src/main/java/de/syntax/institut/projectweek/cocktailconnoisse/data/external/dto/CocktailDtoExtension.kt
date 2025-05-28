@@ -41,6 +41,7 @@ fun CocktailDto.toDomain(): Cocktail {
         instructions = instructions,
         imageUrl = imageUrl ?: "Unbekannte Url",
         modifiedAt = modifiedAt,
+        isAlcoholic = alcoholic == "Alcoholic",
         createdAt = created
     )
     cocktail.ingredients = ingredients
