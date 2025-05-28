@@ -21,12 +21,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import de.schinke.steffen.ui.helpers.AppLauncher
 import de.schinke.steffen.ui.helpers.AppNavigator
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.Launch
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Categories
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Cocktails
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Details
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Favorites
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Home
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Settings
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.*
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.theme.CocktailConnoisseTheme
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.SettingsViewModel
@@ -39,18 +34,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
 
+        setContent {
             val viewModel: SettingsViewModel = koinViewModel()
             val isDarkTheme = viewModel.isDarkTheme.collectAsState().value
 
-            // status panel customization
+            // StatusBar anpassen je nach Theme
             SideEffect {
                 enableEdgeToEdge(
                     statusBarStyle = if (!isDarkTheme) {
-                        SystemBarStyle.dark(
-                            Color.Transparent.toArgb()
-                        )
+                        SystemBarStyle.dark(Color.Transparent.toArgb())
                     } else {
                         SystemBarStyle.light(
                             Color.White.toArgb(),
@@ -61,45 +54,30 @@ class MainActivity : ComponentActivity() {
             }
 
             CocktailConnoisseTheme(darkTheme = isDarkTheme) {
+                val navigationBottomBarColor = MaterialTheme.colorScheme.secondary
 
+                val navigationBottomBarItemColors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = if (isDarkTheme) Color.Black else MaterialTheme.colorScheme.secondary,
+                    unselectedIconColor = if (isDarkTheme) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedTextColor = if (isDarkTheme) Color.Black else MaterialTheme.colorScheme.onSecondaryContainer,
+                    unselectedTextColor = if (isDarkTheme) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
+                )
                 AppLauncher(
-
                     duration = 3.seconds,
-                    launchContent = {
-                        Launch()
-                    }
+                    launchContent = { Launch() }
                 ) {
-
                     AppNavigator(
                         modifier = Modifier.padding(top = 70.dp),
                         startScreen = Home,
-                        allRoutes =
-                            listOf(
-                                Home,
-                                Favorites,
-                                Categories,
-                                Settings,
-                                Details,
-                                Filters,
-                                Cocktails
-                            ),    // bei weiteren screens od sheets muss hier eingefügt werden
-                        allTabRoutes =
-                            listOf(
-                                Home,
-                                Favorites,
-                                Categories,
-                                Settings
-                            ), // bei weiteren tabs muss hier eingefügt werden
-                        navigationBottomBarColor =
-                            MaterialTheme.colorScheme.secondary,
-                        navgationBottomBarItemColors =
-                            NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.secondary,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                indicatorColor = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
+                        allRoutes = listOf(
+                            Home, Favorites, Categories, Settings, Details, Filters, Cocktails
+                        ),
+                        allTabRoutes = listOf(
+                            Home, Favorites, Categories, Settings
+                        ),
+                        navigationBottomBarColor = navigationBottomBarColor,
+                        navgationBottomBarItemColors = navigationBottomBarItemColors
                     )
                 }
             }

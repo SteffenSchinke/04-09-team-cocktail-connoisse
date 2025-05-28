@@ -29,10 +29,6 @@ private val lightScheme = lightColorScheme(
     onError = onErrorLight,
     errorContainer = errorContainerLight,
     onErrorContainer = onErrorContainerLight,
-    background = backgroundLight,
-    onBackground = onBackgroundLight,
-    surface = surfaceLight,
-    onSurface = onSurfaceLight,
     surfaceVariant = surfaceVariantLight,
     onSurfaceVariant = onSurfaceVariantLight,
     outline = outlineLight,
@@ -41,13 +37,18 @@ private val lightScheme = lightColorScheme(
     inverseSurface = inverseSurfaceLight,
     inverseOnSurface = inverseOnSurfaceLight,
     inversePrimary = inversePrimaryLight,
-    surfaceDim = surfaceDimLight,
-    surfaceBright = surfaceBrightLight,
+
+    background = backgroundLight,
+    surface = surfaceLight,
+    onBackground = onBackgroundLight,
+    onSurface = onSurfaceLight,
     surfaceContainerLowest = surfaceContainerLowestLight,
     surfaceContainerLow = surfaceContainerLowLight,
     surfaceContainer = surfaceContainerLight,
     surfaceContainerHigh = surfaceContainerHighLight,
     surfaceContainerHighest = surfaceContainerHighestLight,
+    surfaceDim = surfaceDimLight,
+    surfaceBright = surfaceBrightLight,
 )
 
 private val darkScheme = darkColorScheme(
