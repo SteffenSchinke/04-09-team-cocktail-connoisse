@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -76,23 +75,12 @@ object Favorites : AppRouteTab, AppRouteContent {
 
                 val viewModelState by viewModelFavorite.state.collectAsState()
                 val apiError by viewModelFavorite.apiError.collectAsState()
-                val cocktails = viewModelFavorite.loadFavorites().collectAsState().value
-
-
-               /* LaunchedEffect(Unit) {
-
-                    if (viewModelState == ViewModelState.READY) {
-
-                        viewModelFavorite.loadFavorites()
-                    }
-                }
-
-                */
+                val cocktails = viewModelFavorite.loadFavorites()
 
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, cocktails)
+                        Content(navController, cocktails.value)
                     }
 
                     ViewModelState.WORKING -> {
