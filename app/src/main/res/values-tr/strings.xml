@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cocktail Connoisse</string>
+    <string name="label_home_title1">Tavsiye</string>
+    <string name="label_home_title2">Öneriler</string>
+    <string name="label_home_title3">Daha fazla göster</string>
+    <string name="label_favorites_empty">Ne yazık ki listenizde henüz favori yok.</string>
+    <string name="label_search">Arama...</string>
+    <string name="label_close">Kapat</string>
+    <string name="label_mit_alkohol">alkol ile</string>
+    <string name="label_ohne_alkohol">alkolsüz</string>
+    <string name="label_no_cocktails_found">\"%2$s\" adı altında %1$s kokteyli bulunamadı.</string>
+    <string name="api_error_parse">API yanıtının gövdesi hatalıydı.</string>
+    <string name="api_error_response">API bir hata ile yanıt verir.</string>
+    <string name="api_error_persistence">Önbellekte kokteyl bulunamadı.</string>
+    <string name="api_error_persistences">Önbellekte kokteyl bulunamadı.</string>
+    <string name="api_error_unknown">Bilinmeyen API hatası.</string>
+    <string name="screen_home">Ev</string>
+    <string name="screen_cocktails">Kokteyller</string>
+    <string name="screen_categories">Kategoriler</string>
+    <string name="screen_favorites">Favoriler</string>
+    <string name="screen_settings">Ayarlar</string>
+    <string name="screen_details">Detaylar</string>
+    <string name="sheet_filters">Filtreler</string>
+    <string name="sheet_suggestions">Öneriler</string>
+    <string name="label_display">Ekran</string>
+    <string name="label_cache">Veri önbelleği</string>
+    <string name="label_cache_hit">Önbelleği geri alınamaz şekilde silme</string>
+    <string name="label_cache_btn">Önbelleği boşaltın</string>
+    <string name="label_notifications">Bildirimler</string>
+    <string name="label_notification_error_on">Hataları kapatın</string>
+    <string name="label_notification_error_off">Hataları açın</string>
+    <string name="label_notification_tip_on">İpuçlarını kapatın</string>
+    <string name="label_notification_tip_off">Notları açın</string>
+    <string name="label_notification_info_on">Bilgi kapatın</string>
+    <string name="label_notification_info_off">Bilgi açın</string>
+    <string name="label_dark_mode_enabled">Karanlık modu kapatın</string>
+    <string name="label_dark_mode_disabled">Karanlık modu açın</string>
+    <string name="label_with_alcohol">Alkol ile</string>
+    <string name="label_without_alcohol">Alkolsüz</string>
+</resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cocktail Connoisse</string>
+    <string name="screen_home">Inicio</string>
+    <string name="screen_cocktails">Cócteles</string>
+    <string name="screen_categories">Categorías</string>
+    <string name="screen_favorites">Favoritos</string>
+    <string name="screen_settings">Ajustes</string>
+    <string name="screen_details">detalles</string>
+    <string name="sheet_filters">Filtros</string>
+    <string name="sheet_suggestions">Sugerencias</string>
+    <string name="label_display">Mostrar</string>
+    <string name="label_cache">Caché de datos</string>
+    <string name="label_cache_hit">Borrar caché irrevocablemente</string>
+    <string name="label_cache_btn">Vaciar caché</string>
+    <string name="label_notifications">Notificaciones</string>
+    <string name="label_notification_error_on">Error de desconexión</string>
+    <string name="label_notification_error_off">Error de encendido</string>
+    <string name="label_notification_tip_on">Desconectar pistas</string>
+    <string name="label_notification_tip_off">Encender notas</string>
+    <string name="label_notification_info_on">Desconectar información</string>
+    <string name="label_notification_info_off">Información sobre el encendido</string>
+    <string name="label_dark_mode_enabled">Desactivar el modo oscuro</string>
+    <string name="label_dark_mode_disabled">Activar el modo oscuro</string>
+    <string name="label_with_alcohol">Con alcohol</string>
+    <string name="label_without_alcohol">Sin alcohol</string>
+    <string name="label_close">Cerrar</string>
+    <string name="label_mit_alkohol">con alcohol</string>
+    <string name="label_ohne_alkohol">sin alcohol</string>
+    <string name="label_home_title1">Recomendación</string>
+    <string name="label_home_title2">Sugerencias</string>
+    <string name="label_home_title3">Ver más</string>
+    <string name="label_favorites_empty">Lamentablemente, aún no hay favoritos en su lista.</string>
+    <string name="label_search">Buscar...</string>
+    <string name="label_no_cocktails_found">No se han encontrado cócteles %1$s con el nombre \"%2$s\".</string>
+    <string name="api_error_parse">El cuerpo de la respuesta de la API era incorrecto.</string>
+    <string name="api_error_response">La API responde con un error.</string>
+    <string name="api_error_persistence">No se ha encontrado ningún cóctel en el caché.</string>
+    <string name="api_error_persistences">No se han encontrado cócteles en el caché.</string>
+    <string name="api_error_unknown">Error de API desconocido.</string>
+</resources>

@@ -217,7 +217,7 @@ object Home : AppRouteTab, AppRouteContent {
                             homeViewModel.searchText = it
                             homeViewModel.searchCocktailsByName(it)
                         },
-                        placeholder = { Text("Suche...") },
+                        placeholder = { Text(stringResource(R.string.label_search)) },
                         modifier = Modifier
                             .fillMaxWidth()
                     )
@@ -229,7 +229,7 @@ object Home : AppRouteTab, AppRouteContent {
                         },
                         modifier = Modifier.padding(top = 10.dp, bottom = 20.dp)
                     ) {
-                        Text("Schließen")
+                        Text(stringResource(R.string.label_close))
                     }
                 }
                 if (homeViewModel.searchText.isNotBlank()) {
@@ -238,9 +238,9 @@ object Home : AppRouteTab, AppRouteContent {
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            val typeText = if (withAlcoholic) "mit Alkohol" else "ohne Alkohol"
+                            val typeText = if (withAlcoholic) stringResource(R.string.label_mit_alkohol) else stringResource(R.string.label_ohne_alkohol)
                             Text(
-                                text = "Keine Cocktails $typeText unter dem Namen \"${homeViewModel.searchText}\" gefunden",
+                                text = stringResource(R.string.label_no_cocktails_found, typeText, homeViewModel.searchText),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
