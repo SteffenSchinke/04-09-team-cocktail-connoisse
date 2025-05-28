@@ -31,7 +31,7 @@
     <string name="label_home_title2">Sugerencias</string>
     <string name="label_home_title3">Ver más</string>
     <string name="label_favorites_empty">Lamentablemente, aún no hay favoritos en su lista.</string>
-    <string name="label_search">Buscar...</string>
+    <string name="label_search">Buscar…</string>
     <string name="label_favorite_on">Favorito activado</string>
     <string name="label_favorite_off">Favorito desactivado</string>
     <string name="label_no_cocktails_found">No se han encontrado cócteles %1$s con el nombre \"%2$s\".</string>
