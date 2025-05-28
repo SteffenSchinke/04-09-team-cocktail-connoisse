@@ -38,4 +38,6 @@
     <string name="label_dark_mode_disabled">Karanlık modu açın</string>
     <string name="label_with_alcohol">Alkol ile</string>
     <string name="label_without_alcohol">Alkolsüz</string>
+    <string name="label_favorite_on">Favori açık</string>
+    <string name="label_favorite_off">Favori kapalı</string>
 </resources>

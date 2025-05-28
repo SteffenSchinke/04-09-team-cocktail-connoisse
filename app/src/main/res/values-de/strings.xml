@@ -33,7 +33,8 @@
     <string name="label_mit_alkohol">mit Alkohol</string>
     <string name="label_ohne_alkohol">ohne Alkohol</string>
     <string name="label_no_cocktails_found">Keine Cocktails %1$s unter dem Namen \"%2$s\" gefunden.</string>
-    <string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
+    <string name="label_favorite_on">"Favorit ein"</string>">
+    <string name="label_favorite_off">"Favorit aus"</string>"><string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
     <string name="api_error_response">Die API antwortet mit einem Fehler.</string>
     <string name="api_error_persistence">Kein Cocktail im Cache gefunden.</string>
     <string name="api_error_persistences">Keine Cocktails im Cache gefunden.</string>

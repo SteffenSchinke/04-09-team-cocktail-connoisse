@@ -33,6 +33,8 @@
     <string name="label_mit_alkohol">avec alcool</string>
     <string name="label_ohne_alkohol">sans alcool</string>
     <string name="label_no_cocktails_found">Aucun cocktail %1$s trouvé sous le nom \"%2$s\".</string>
+    <string name="label_favorite_on">Favori activé</string>
+    <string name="label_favorite_off">Favori désactivé</string>
     <string name="api_error_parse">Le corps de la réponse API était erroné.</string>
     <string name="api_error_response">L\'API répond par une erreur.</string>
     <string name="api_error_persistence">Pas de cocktail trouvé dans la cache</string>

@@ -28,14 +28,14 @@
     <string name="label_home_title1">Empfehlung</string>">
     <string name="label_home_title2">Vorschläge</string>">
     <string name="label_home_title3">"Mehr anzeigen"</string>">
-    <string name="label_favorite_on">"Favorit ein"</string>">
-    <string name="label_favorite_off">"Favorit aus"</string>">
     <string name="label_favorites_empty">"Leider sind noch keine Favoriten in deiner Liste."</string>">
     <string name="label_search">"Suche…"</string>">
     <string name="label_close">"Schließen"</string>">
     <string name="label_mit_alkohol">"mit Alkohol"</string>">
     <string name="label_ohne_alkohol">"ohne Alkohol"</string>">
     <string name="label_no_cocktails_found">Keine Cocktails %1$s unter dem Namen \"%2$s\" gefunden.</string>
+    <string name="label_favorite_on">"Favorit ein"</string>">
+    <string name="label_favorite_off">"Favorit aus"</string>">
 
     <string name="api_error_parse">Der Body der API Antwort war fehlerhaft.</string>
     <string name="api_error_response">Die API antwortet mit einem Fehler.</string>

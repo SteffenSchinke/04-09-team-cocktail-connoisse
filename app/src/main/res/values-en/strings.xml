@@ -32,6 +32,8 @@
     <string name="label_close">Close</string>
     <string name="label_mit_alkohol">with alcohol</string>
     <string name="label_ohne_alkohol">without alcohol</string>
+    <string name="label_favorite_on">Favorite on</string>
+    <string name="label_favorite_off">Favorite off</string>
     <string name="label_no_cocktails_found">No cocktails %1$s found under the name \"%2$s\".</string>
     <string name="api_error_parse">The body of the API response was incorrect.</string>
     <string name="api_error_response">The API responds with an error.</string>
