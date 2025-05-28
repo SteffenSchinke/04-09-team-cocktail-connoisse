@@ -7,6 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import androidx.core.content.edit
+import kotlinx.coroutines.DelicateCoroutinesApi
 
 @Database(entities = [Cocktail::class, Ingredient::class], version = 1, exportSchema = false)
 abstract class CocktailDatabase : RoomDatabase() {
@@ -17,6 +21,7 @@ abstract class CocktailDatabase : RoomDatabase() {
         @Volatile
         private var instance: CocktailDatabase? = null
 
+        @OptIn(DelicateCoroutinesApi::class)
         fun getDatabase(context: Context): CocktailDatabase {
             return instance ?:
                 synchronized(this) {
@@ -25,13 +30,29 @@ abstract class CocktailDatabase : RoomDatabase() {
                         CocktailDatabase::class.java,
                         "app_cocktails_db"
                     )
-                    .addCallback(object : Callback() {
-                        override fun onOpen(db: SupportSQLiteDatabase) {
-                            super.onOpen(db)
-                            db.execSQL("PRAGMA foreign_keys=ON")
+                        .addCallback(object : RoomDatabase.Callback() {
+                            override fun onCreate(db: SupportSQLiteDatabase) {
+                                super.onCreate(db)
+                                db.execSQL("PRAGMA foreign_keys=ON")
+                            }
+
+                            override fun onOpen(db: SupportSQLiteDatabase) {
+                                super.onOpen(db)
+                                db.execSQL("PRAGMA foreign_keys=ON")
+                            }
+                        })
+                    .build().also { db ->
+                            instance = db
+
+                            GlobalScope.launch {
+                                val prefs = context.getSharedPreferences("init_flags", Context.MODE_PRIVATE)
+                                if (!prefs.getBoolean("db_initialized", false)) {
+                                    db.cocktailDao().clearCachedCocktails()
+                                    db.cocktailDao().clearCachedIngredients()
+                                    prefs.edit { putBoolean("db_initialized", true) }
+                                }
+                            }
                         }
-                    })
-                    .build().also { instance = it }
             }
         }
     }
