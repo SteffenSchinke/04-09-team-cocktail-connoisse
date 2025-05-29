@@ -1,7 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
@@ -28,19 +27,18 @@ class HomeViewModel(
     private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
-    // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails
-
-    private val _repositoryOperationError = MutableStateFlow<RepositoryOperationError?>(null)
-    val repositoryOperationError: StateFlow<RepositoryOperationError?> = _repositoryOperationError
+    private var _searchJob: Job? = null
+    private val _repoError = MutableStateFlow<RepositoryError?>(null)
+    val repoError: StateFlow<RepositoryError?> = _repoError
 
     private val _cocktailType = MutableStateFlow(CocktailType.ALCOHOLIC)
     val cocktailType: StateFlow<CocktailType> = _cocktailType
 
-    private val _randomCocktail = MutableStateFlow<Cocktail?>(null)
-    val randomCocktail: StateFlow<Cocktail?> = _randomCocktail
+    private val _cocktail = MutableStateFlow<Cocktail?>(null)
+    val cocktail: StateFlow<Cocktail?> = _cocktail
 
-    private val _randomCocktails = MutableStateFlow<List<Cocktail>>(emptyList())
-    val randomCocktails: StateFlow<List<Cocktail>> = _randomCocktails
+    private val _cocktails = MutableStateFlow<List<Cocktail>>(emptyList())
+    val cocktails: StateFlow<List<Cocktail>> = _cocktails
 
     private val _searchedCocktails = mutableStateOf<List<Cocktail>>(emptyList())
     val searchedCocktails: MutableState<List<Cocktail>> = _searchedCocktails
@@ -56,36 +54,6 @@ class HomeViewModel(
     var isSearching by mutableStateOf(false)
     var searchText by mutableStateOf("")
 
-    // TODO sts 29.05.25 - removed
-//
-//    private val _updatedCocktail = MutableStateFlow<Cocktail?>(null)
-//    val updatedCocktail: StateFlow<Cocktail?> = _updatedCocktail
-//
-//
-//    fun updateFavorite(cocktail: Cocktail) {
-//        if (state.value != ViewModelState.READY) return
-//
-//        setState { ViewModelState.WORKING }
-//
-//        try {
-//            viewModelScope.launch {
-//                val newCocktail = cocktailRepo.getCocktailById(cocktail.id.toString())
-//                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-//                newCocktail.value?.let {
-//                    it.favorited = !cocktail.favorited
-//                    cocktailRepo.updateCocktail(it)
-//                    setState { ViewModelState.READY }
-//                    _updatedCocktail.value = it
-//                }
-//                setState { ViewModelState.READY }
-//            }
-//        } catch (e: ApiError) {
-//
-//            _apiError.value = e
-//            setState { ViewModelState.ERROR }
-//        }
-//    }
-
     fun loadCocktails() {
 
         if (state.value != ViewModelState.READY) return
@@ -96,22 +64,22 @@ class HomeViewModel(
 
             try {
 
-                cocktailRepo.getRandomCocktail().collect { cocktail ->
-                    _randomCocktail.value = cocktail
+                cocktailRepo.getCocktail().collect { cocktail ->
+                    _cocktail.value = cocktail
                 }
 
-                cocktailRepo.getCocktailsByType(
-                    if (withAlcoholic.value) CocktailType.ALCOHOLIC.label
-                    else CocktailType.NON_ALCOHOLIC.label
-                ).collect { cocktails ->
-                    _randomCocktails.value = cocktails
+                cocktailRepo.getCocktails(
+                    count = 30,
+                    type =
+                        if (withAlcoholic.value) CocktailType.ALCOHOLIC
+                        else CocktailType.NON_ALCOHOLIC).collect { cocktails ->
+                    _cocktails.value = cocktails
                 }
 
-                Log.d("HomeViewModel", "loadCocktails() ready")
                 setState { ViewModelState.READY }
-            } catch (e: RepositoryOperationError) {
+            } catch (e: RepositoryError) {
 
-                _repositoryOperationError.value = e
+                _repoError.value = e
                 setState { ViewModelState.ERROR }
             }
         }
@@ -125,15 +93,11 @@ class HomeViewModel(
         loadCocktails()
     }
 
-    fun resetApiError() {
-        _repositoryOperationError.value = null
-    }
-
-    private var searchJob: Job? = null
+    fun resetApiError() { _repoError.value = null }
 
     fun searchCocktailsByName(name: String) {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
+        _searchJob?.cancel()
+        _searchJob = viewModelScope.launch {
             cocktailRepo.getCocktails(name)
                 .catch { e ->
                     _searchedCocktails.value = emptyList()

@@ -17,7 +17,7 @@ class ApiCocktail(
     interface ApiCocktailService {
 
         @GET("random.php")
-        suspend fun getRandomCocktail(): Response<ResponseCocktailDto>
+        suspend fun getCocktail(): Response<ResponseCocktailDto>
 
         @GET("filter.php")
         suspend fun getCocktailsByType(@Query("a") type: String): Response<ResponseCocktailDto>

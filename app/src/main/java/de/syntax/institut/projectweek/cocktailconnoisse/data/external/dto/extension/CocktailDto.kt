@@ -1,5 +1,6 @@
-package de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto
+package de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.extension
 
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.CocktailDto
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import java.time.LocalDateTime

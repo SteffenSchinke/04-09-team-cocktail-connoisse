@@ -1,7 +1,6 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,6 +59,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemLarge
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemMedium
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
@@ -97,9 +97,9 @@ object Home : AppRouteTab, AppRouteContent {
             viewModel?.let { viewModelHome ->
 
                 val viewModelState by viewModelHome.state.collectAsState()
-                val apiError by viewModelHome.repositoryOperationError.collectAsState()
-                val cocktail = viewModelHome.randomCocktail.collectAsState().value
-                val cocktails = viewModelHome.randomCocktails.collectAsState().value
+                val apiError by viewModelHome.repoError.collectAsState()
+                val cocktail = viewModelHome.cocktail.collectAsState().value
+                val cocktails = viewModelHome.cocktails.collectAsState().value
 
 // TODO sts 29.05.25 - removed
 //
@@ -320,7 +320,6 @@ object Home : AppRouteTab, AppRouteContent {
                         url = cocktail.imageUrl
                     )
 
-                    Log.d("STS::Home Screen", "CocktailItem: ${cocktail.id}")
                     FavoriteSwitch(
                         Modifier
                             .align(Alignment.TopEnd)
@@ -374,47 +373,14 @@ object Home : AppRouteTab, AppRouteContent {
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             contentPadding = PaddingValues(5.dp)
         ) {
-            items(cocktails.take(10)) {
+            items(cocktails) { cocktail ->
 
-                Box(
-                    Modifier.fillMaxWidth()
-                ) {
-                    CostumShadowBox(
-                        elevation = 6.dp,
-                        shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                        cornerRadius = 12.dp,
-                        shadowColor = MaterialTheme.colorScheme.secondary
-                    ) {
-
-                        Box {
-                            CostumAsyncImage(
-                                modifier = Modifier
-                                    .width(250.dp)
-                                    .height(250.dp)
-                                    .clickable {
-                                        navController.navigate(
-                                            Details.route.replace(
-                                                "{id}",
-                                                it.id.toString()
-                                            )
-                                        )
-                                    },
-                                url = it.imageUrl
-                            )
-
-                            Log.d("STS::Home Screen", "CocktailList: ${it.id}")
-                            FavoriteSwitch(
-                                Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(8.dp),
-                                it.id
-                            )
-                        }
-                    }
-
-                    TextWithShadow(
-                        text = it.name,
-                        fontSize = 16.sp
+                CocktailItemMedium(cocktail) {
+                    navController.navigate(
+                        Details.route.replace(
+                            "{id}",
+                            cocktail.id.toString()
+                        )
                     )
                 }
             }

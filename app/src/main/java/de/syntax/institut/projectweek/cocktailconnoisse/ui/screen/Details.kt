@@ -73,7 +73,7 @@ object Details : AppRoute, AppRouteContent {
             viewModel?.let { viewModel ->
 
                 val viewModelState by viewModel.state.collectAsState()
-                val apiError by viewModel.repositoryOperationError.collectAsState()
+                val apiError by viewModel.repoError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val id = navBackStackEntry?.arguments?.getString("id") ?: ""
 

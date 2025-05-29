@@ -28,6 +28,7 @@ class FavoriteSwitchViewModel (
     private fun loadCocktail() {
 
         viewModelScope.launch {
+
             try {
 
                 _cocktail.value = cocktailRepo.getCocktail(cocktailId).singleOrNull()
@@ -44,9 +45,9 @@ class FavoriteSwitchViewModel (
 
             val current = _cocktail.value ?: return@launch
 
-            val updated = current.copy(favorited = !current.favorited)
             try {
 
+                val updated = current.copy(favorited = !current.favorited)
                 cocktailRepo.updateCocktail(updated)
                 _cocktail.value = updated
             } catch (e: Exception) {

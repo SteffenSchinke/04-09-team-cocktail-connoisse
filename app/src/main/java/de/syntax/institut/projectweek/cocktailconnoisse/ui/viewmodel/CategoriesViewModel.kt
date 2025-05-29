@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +21,8 @@ class CategoriesViewModel(
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
 
-    private val _error = MutableStateFlow<RepositoryOperationError?>(null)
-    val error: StateFlow<RepositoryOperationError?> = _error
+    private val _error = MutableStateFlow<RepositoryError?>(null)
+    val error: StateFlow<RepositoryError?> = _error
 
     private val _listForNavigationIds = MutableStateFlow<String?>(null)
     val listForNavigationIds: StateFlow<String?> = _listForNavigationIds
@@ -78,7 +78,7 @@ class CategoriesViewModel(
 //                }
 //
 //                setState { ViewModelState.READY }
-//            } catch (e: RepositoryOperationError) {
+//            } catch (e: repoError) {
 //
 //                _error.value = e
 //                setState { ViewModelState.ERROR }
@@ -100,7 +100,7 @@ class CategoriesViewModel(
 //                }
 //
 //                setState { ViewModelState.READY }
-//            } catch (e: RepositoryOperationError) {
+//            } catch (e: repoError) {
 //
 //                _error.value = e
 //                setState { ViewModelState.ERROR }

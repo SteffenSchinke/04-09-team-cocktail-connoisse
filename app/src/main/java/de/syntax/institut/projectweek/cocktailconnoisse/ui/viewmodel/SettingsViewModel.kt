@@ -10,7 +10,7 @@ import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
 import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.services.AppSnackbar
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.dataStore
@@ -182,7 +182,7 @@ class SettingsViewModel(
                 )
 
                 setState { ViewModelState.READY }
-            } catch (e: RepositoryOperationError) {
+            } catch (e: RepositoryError) {
 
                 sendMessageOnSnackbar(
                     message = e.localizedMessage ?: "api_error_unknown",

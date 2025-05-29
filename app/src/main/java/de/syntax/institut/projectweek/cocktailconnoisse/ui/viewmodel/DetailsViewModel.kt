@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +20,8 @@ class DetailsViewModel(
     private val _cocktail = MutableStateFlow<Cocktail?>(null)
     val cocktail: StateFlow<Cocktail?> = _cocktail
 
-    private val _repositoryOperationError = MutableStateFlow<RepositoryOperationError?>(null)
-    val repositoryOperationError: StateFlow<RepositoryOperationError?> = _repositoryOperationError
+    private val _repoError = MutableStateFlow<RepositoryError?>(null)
+    val repoError: StateFlow<RepositoryError?> = _repoError
 
     fun loadCocktailById(id: String) {
 
@@ -37,13 +37,13 @@ class DetailsViewModel(
                 }
 
                 setState { ViewModelState.READY }
-            } catch (e: RepositoryOperationError) {
+            } catch (e: RepositoryError) {
 
-                _repositoryOperationError.value = e
+                _repoError.value = e
                 setState { ViewModelState.ERROR }
             }
         }
     }
 
-    fun resetApiError() { _repositoryOperationError.value = null }
+    fun resetApiError() { _repoError.value = null }
 }

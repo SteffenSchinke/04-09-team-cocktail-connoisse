@@ -83,7 +83,7 @@ object Cocktails: AppRoute, AppRouteContent {
 
                 val cocktails by viewModelCocktails.cocktails.collectAsState()
                 val viewModelState by viewModelCocktails.state.collectAsState()
-                val apiError by viewModelCocktails.repositoryOperationError.collectAsState()
+                val apiError by viewModelCocktails.repoError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val stringIds= navBackStackEntry?.arguments?.getString("ids") ?: ""
 

@@ -2,9 +2,10 @@ package de.syntax.institut.projectweek.cocktailconnoisse.di
 
 import android.util.Log
 import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiCocktail
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CategoryDao
-import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CocktailDao
+import de.syntax.institut.projectweek.cocktailconnoisse.data.local.dao.CategoryDao
+import de.syntax.institut.projectweek.cocktailconnoisse.data.local.dao.CocktailDao
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.CocktailDatabase
+import de.syntax.institut.projectweek.cocktailconnoisse.data.local.dao.IngredientDao
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoriesViewModel
@@ -38,9 +39,14 @@ val appModule = module {
         CocktailDatabase.getDatabase(get()).categoryDao()
     }
 
+    single<IngredientDao> {
+        Log.d("KoinModule", "IngredientDao")
+        CocktailDatabase.getDatabase(get()).ingredientDao()
+    }
+
     single<CocktailRepositoryInterface> {
         Log.d("KoinModule", "FavoritedCocktailRepositoryInterface")
-        CocktailRepository(get(), get(), get())
+        CocktailRepository(get(), get(), get(), get())
     }
 
     Log.d("KoinModule", "HomeViewModel")

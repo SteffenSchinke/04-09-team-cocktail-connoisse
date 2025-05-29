@@ -49,6 +49,7 @@ import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemSmall
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
@@ -79,7 +80,7 @@ object Favorites : AppRouteTab, AppRouteContent {
             viewModel?.let { viewModelFavorite ->
 
                 val viewModelState by viewModelFavorite.state.collectAsState()
-                val apiError by viewModelFavorite.repositoryOperationError.collectAsState()
+                val apiError by viewModelFavorite.repoError.collectAsState()
                 val cocktails = viewModelFavorite.cocktails.collectAsState().value
 
                 when (viewModelState) {
@@ -139,8 +140,7 @@ object Favorites : AppRouteTab, AppRouteContent {
         navController: NavHostController,
         cocktails: List<Cocktail>
     ) {
-
-
+        
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -174,52 +174,13 @@ object Favorites : AppRouteTab, AppRouteContent {
 
                     items(cocktails) { cocktail ->
 
-                        Box(
-                            Modifier
-                                .aspectRatio(1f)
-                                .padding(12.dp)
-                        ) {
-
-                            CostumShadowBox(
-                                elevation = 6.dp,
-                                shadowPositions = setOf(
-                                    ShadowPosition.TOP,
-                                    ShadowPosition.LEFT
-                                ),
-                                cornerRadius = 12.dp,
-                                shadowColor = MaterialTheme.colorScheme.secondary
-                            ) {
-
-                                CostumAsyncImage(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clickable {
-                                            navController.navigate(
-                                                Details.route.replace(
-                                                    "{id}",
-                                                    cocktail.id.toString()
-                                                )
-                                            )
-                                        },
-                                    url = cocktail.imageUrl
+                        CocktailItemSmall(cocktail) {
+                            navController.navigate(
+                                Details.route.replace(
+                                    "{id}",
+                                    cocktail.id.toString()
                                 )
-                            }
-                            TextWithShadow(
-                                text = cocktail.name,
-                                fontSize = 16.sp
                             )
-
-                            Column(
-                                Modifier.fillMaxSize()
-                            ) {
-                                Row(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .padding(8.dp),
-                                        verticalAlignment = Alignment.Bottom,
-                                    horizontalArrangement = Arrangement.End
-                                ) { FavoriteSwitch(Modifier.padding(8.dp), cocktail.id) }
-                            }
                         }
                     }
                 }

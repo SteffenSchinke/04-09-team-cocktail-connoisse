@@ -1,8 +1,9 @@
-package de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto
+package de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.extension
 
 import de.syntax.institut.projectweek.cocktailconnoisse.R
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationErrorType
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryErrorType
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.dto.CategoryDto
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -28,8 +29,8 @@ fun CategoryDto.toDomain(): Category {
                 "Homemade Liqueur" -> R.drawable.category_homemade_liqueur
                 "Beer" -> R.drawable.category_beer
                 "Soft Drink" -> R.drawable.category_soft_drink
-                else -> throw RepositoryOperationError(
-                    type = RepositoryOperationErrorType.CATEGORY_FAILED,
+                else -> throw RepositoryError(
+                    type = RepositoryErrorType.CATEGORY_FAILED,
                     responseCode = null,
                     innerMessage = "Unknown category: $name"
                 )

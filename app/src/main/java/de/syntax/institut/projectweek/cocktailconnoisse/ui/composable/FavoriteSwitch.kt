@@ -14,6 +14,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoriteSwi
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+
 @Composable
 internal fun FavoriteSwitch(
 
@@ -21,7 +22,6 @@ internal fun FavoriteSwitch(
     cocktailId: Long
 ) {
 
-    //val viewModel: FavoriteSwitchViewModel = koinViewModel(parameters = { parametersOf(cocktailId) })
     val viewModel: FavoriteSwitchViewModel = koinViewModel(
         key = "favoriteSwitchViewModel_$cocktailId",
         parameters = { parametersOf(cocktailId) }

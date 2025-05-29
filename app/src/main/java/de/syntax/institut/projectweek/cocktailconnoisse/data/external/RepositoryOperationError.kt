@@ -1,13 +1,13 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.data.external
 
-class RepositoryOperationError(
+class RepositoryError(
 
-    val type: RepositoryOperationErrorType,
+    val type: RepositoryErrorType,
     val responseCode: Int? = null,
     val innerMessage: String? = null
 ) : Exception()
 
-enum class RepositoryOperationErrorType {
+enum class RepositoryErrorType {
 
     RESPONSE_FAILED,
     PARSING_FAILED,
