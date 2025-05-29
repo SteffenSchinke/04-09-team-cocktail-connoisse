@@ -20,9 +20,9 @@ import de.syntax.institut.projectweek.cocktailconnoisse.ui.screen.Details
 
 @Composable
 internal fun CocktailItemLarge (
+
     cocktail: Cocktail,
-    navController: NavHostController,
-    onFavoriteChange: (Cocktail) -> Unit
+    navController: NavHostController
 ) {
 
         Spacer(Modifier.height(20.dp))
@@ -57,8 +57,7 @@ internal fun CocktailItemLarge (
                     FavoriteSwitch(
                         modifier = Modifier
                             .padding(8.dp),
-                        cocktail = cocktail,
-                        onFavoriteChange = { onFavoriteChange(cocktail) }
+                        cocktailId = cocktail.id,
                     )
                 }
             }

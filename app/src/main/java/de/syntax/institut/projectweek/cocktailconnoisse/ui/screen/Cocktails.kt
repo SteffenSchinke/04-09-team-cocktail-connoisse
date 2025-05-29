@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -47,6 +49,7 @@ import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CocktailsViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -80,7 +83,7 @@ object Cocktails: AppRoute, AppRouteContent {
 
                 val cocktails by viewModelCocktails.cocktails.collectAsState()
                 val viewModelState by viewModelCocktails.state.collectAsState()
-                val apiError by viewModelCocktails.apiError.collectAsState()
+                val apiError by viewModelCocktails.repositoryOperationError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val stringIds= navBackStackEntry?.arguments?.getString("ids") ?: ""
 
@@ -208,6 +211,18 @@ object Cocktails: AppRoute, AppRouteContent {
                             text = cocktail.name,
                             fontSize = 16.sp
                             )
+
+                        Column(
+                            Modifier.fillMaxSize()
+                        ) {
+                            Row(
+                                Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.End
+                            ) { FavoriteSwitch(Modifier.padding(8.dp), cocktail.id) }
+                        }
                     }
                 }
             }

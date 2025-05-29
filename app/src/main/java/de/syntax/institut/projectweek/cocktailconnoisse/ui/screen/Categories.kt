@@ -2,20 +2,10 @@ package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,25 +18,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.enums.SnackbarDisplayTime
 import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
@@ -56,12 +36,12 @@ import de.schinke.steffen.interfaces.AppRouteSheet
 import de.schinke.steffen.interfaces.AppRouteTab
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
-import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CategoryRow
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CategoryRowTwice
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.sheet.Filters
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.CategoriesViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -93,39 +73,55 @@ object Categories : AppRouteTab, AppRouteContent {
             viewModel?.let { viewModel ->
 
                 val viewModelState by viewModel.state.collectAsState()
-                val apiError by viewModel.apiError.collectAsState()
+                val apiError by viewModel.error.collectAsState()
                 val categories by viewModel.categories.collectAsState()
-                val hasNavigated by viewModel.hasNavigated.collectAsState()
-                val cocktailsByCategory by viewModel.cocktailsByCategory.collectAsState()
-                val lifecycleOwner = LocalLifecycleOwner.current
+                val listForNavigationIds by viewModel.listForNavigationIds.collectAsState()
 
-                DisposableEffect(lifecycleOwner) {
-                    val observer = LifecycleEventObserver { _, event ->
-                        if (event == Lifecycle.Event.ON_RESUME) {
-                            viewModel.resetNavigationFlag()
-                        }
-                    }
+//                val hasNavigated by viewModel.hasNavigated.collectAsState()
+//                val cocktailsByCategory by viewModel.cocktailsByCategory.collectAsState()
+//                val lifecycleOwner = LocalLifecycleOwner.current
 
-                    val lifecycle = lifecycleOwner.lifecycle
-                    lifecycle.addObserver(observer)
+//                DisposableEffect(lifecycleOwner) {
+//                    val observer = LifecycleEventObserver { _, event ->
+//                        if (event == Lifecycle.Event.ON_RESUME) {
+//                            viewModel.resetNavigationFlag()
+//                        }
+//                    }
+//
+//                    val lifecycle = lifecycleOwner.lifecycle
+//                    lifecycle.addObserver(observer)
+//
+//                    onDispose {
+//                        lifecycle.removeObserver(observer)
+//                    }
+//                }
 
-                    onDispose {
-                        lifecycle.removeObserver(observer)
-                    }
-                }
+//                LaunchedEffect(cocktailsByCategory, hasNavigated) {
+//                    if (cocktailsByCategory.isNotEmpty() && !hasNavigated) {
+//                        val route = Cocktails.route
+//                            .replace(
+//                                "{ids}", cocktailsByCategory
+//                                    .shuffled()
+//                                    .take(30)
+//                                    .joinToString(",") { it.id.toString() })
+//                            .replace("{top_bar_title}", viewModel.navigatedCategory.value)
+//
+//                        navController.navigate(route)
+//                        viewModel.setNavigationFlag()
+//                    }
+//                }
 
-                LaunchedEffect(cocktailsByCategory, hasNavigated) {
-                    if (cocktailsByCategory.isNotEmpty() && !hasNavigated) {
+                LaunchedEffect(listForNavigationIds) {
+
+                    listForNavigationIds?.let {
                         val route = Cocktails.route
-                            .replace(
-                                "{ids}", cocktailsByCategory
-                                    .shuffled()
-                                    .take(30)
-                                    .joinToString(",") { it.id.toString() })
-                            .replace("{top_bar_title}", viewModel.navigatedCategory.value)
+                            .replace("{ids}", it)
+                            .replace("{top_bar_title}",
+                                viewModel.clickedCategory.value?.name ?: "Cocktails"
+                            )
 
-                        navController.navigate(route)
-                        viewModel.setNavigationFlag()
+                        Log.d("Categories Screen", "navigate to: $route")
+                        // navController.navigate(route)
                     }
                 }
 
@@ -198,173 +194,33 @@ object Categories : AppRouteTab, AppRouteContent {
 
     @Composable
     private fun Content(viewModel: CategoriesViewModel, categories: List<Category>) {
-        Column(Modifier.fillMaxSize()) {
 
-            Log.d("Categories", "categories: $categories")
-
-            LazyColumn {
-                item {
-                    OneItem(
-                        category = categories[0],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    TwoItems(
-                        categoryOne = categories[1],
-                        categoryTwo = categories[2],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    OneItem(
-                        category = categories[3],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    TwoItems(
-                        categoryOne = categories[4],
-                        categoryTwo = categories[5],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    OneItem(
-                        category = categories[6],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    TwoItems(
-                        categoryOne = categories[7],
-                        categoryTwo = categories[8],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    OneItem(
-                        category = categories[9],
-                        viewModel = viewModel
-                    )
-                }
-                item {
-                    OneItem(
-                        category = categories[10],
-                        viewModel = viewModel
-                    )
-                }
-            }
-        }
-    }
-
-
-    @Composable
-    private fun OneItem(category: Category, viewModel: CategoriesViewModel) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 6.dp)
-                .padding(bottom = 30.dp, top = 10.dp)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
         ) {
-            CostumShadowBox(
-                elevation = 6.dp,
-                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                cornerRadius = 20.dp,
-                shadowColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Image(
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .fillMaxWidth()
-                        .clickable(onClick = {
-                            viewModel.loadCocktailsFromCategory(category)
-                        }),
-                    painter = painterResource(id = category.imageId),
-                    contentDescription = category.name
-                )
-            }
-            TextWithShadow(
-                text = category.name,
-                fontSize = 16.sp
-            )
-        }
-    }
+            val chunked = categories.chunked(3)
 
-    @Composable
-    fun TwoItems(categoryOne: Category, categoryTwo: Category, viewModel: CategoriesViewModel) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 20.dp))
-        {
-            Box(Modifier
-                .weight(1f)
-                .padding(start = 6.dp)
-            ) {
-                CostumShadowBox(
-                    Modifier
-                        .aspectRatio(1f)
-                        .fillMaxWidth(),
-                        elevation = 6.dp,
-                    shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                    cornerRadius = 20.dp,
-                    shadowColor = MaterialTheme.colorScheme.secondary
-                ) {
-                    Image(
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable(onClick = {
-                                viewModel.loadCocktailsFromCategory(categoryOne)
-                            }),
-                        painter = painterResource(id = categoryOne.imageId),
-                        contentDescription = categoryOne.name
-                    )
+            items(chunked) { chunk ->
+                when (chunk.size) {
+                    1 -> {
+                        CategoryRow(chunk[0]) {
+                            viewModel.onCategoryClick(it)
+                        }
+                    }
+                    2 -> {
+                        CategoryRowTwice(chunk[0], chunk[1]) {
+                            viewModel.onCategoryClick(it)
+                        }
+                    }
+                    3 -> {
+                        CategoryRow(chunk[0]) {
+                            viewModel.onCategoryClick(it)
+                        }
+                        CategoryRowTwice(chunk[0], chunk[1]) {
+                            viewModel.onCategoryClick(it)
+                        }
+                    }
                 }
-                TextWithShadow(
-                    text = categoryOne.name,
-                    fontSize = 16.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.width(30.dp))
-
-            Box(
-                Modifier
-                    .weight(1f)
-                    .padding(start = 6.dp)
-            ) {
-                CostumShadowBox(
-                    Modifier
-                        .aspectRatio(1f)
-                        .fillMaxWidth(),
-                    elevation = 6.dp,
-                    shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                    cornerRadius = 20.dp,
-                    shadowColor = MaterialTheme.colorScheme.secondary
-                ) {
-                    Image(
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(20.dp))
-                            .clickable(onClick = {
-                                viewModel.loadCocktailsFromCategory(categoryTwo)
-                            }),
-
-                        painter = painterResource(id = categoryTwo.imageId),
-                        contentDescription = categoryTwo.name
-                    )
-                }
-                TextWithShadow(
-                    text = categoryTwo.name,
-                    fontSize = 16.sp
-                )
             }
         }
     }

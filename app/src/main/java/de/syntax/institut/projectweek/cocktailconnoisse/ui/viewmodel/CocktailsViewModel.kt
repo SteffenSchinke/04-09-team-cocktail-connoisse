@@ -4,10 +4,9 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,8 +17,8 @@ class CocktailsViewModel(
     private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
-    private val _apiError = MutableStateFlow<ApiError?>(null)
-    val apiError: StateFlow<ApiError?> = _apiError
+    private val _repositoryOperationError = MutableStateFlow<RepositoryOperationError?>(null)
+    val repositoryOperationError: StateFlow<RepositoryOperationError?> = _repositoryOperationError
 
     private val _cocktails = MutableStateFlow<List<Cocktail>>(emptyList())
     val cocktails: StateFlow<List<Cocktail>> = _cocktails
@@ -37,28 +36,22 @@ class CocktailsViewModel(
 
                 val result: MutableList<Cocktail> = mutableListOf()
                 listId.forEach { id ->
-                    cocktailRepo.getCocktailById(id).collect { cocktail ->
+                    cocktailRepo.getCocktail(id.toLong()).collect { cocktail ->
                         cocktail?.let {
                             result.add(it)
-
-                            // todo repo
-                            // TODO sts 26.05.25 - cache handling per time line ?!?!?
-                            launch(Dispatchers.IO) {
-                                cocktailRepo.insertCachedCocktailWithIngredients(it, it.ingredients)
-                            }
                         }
                     }
                 }
 
                 _cocktails.value = result
                 setState { ViewModelState.READY }
-            } catch (e: ApiError) {
+            } catch (e: RepositoryOperationError) {
 
-                _apiError.value = e
+                _repositoryOperationError.value = e
                 setState { ViewModelState.ERROR }
             }
         }
     }
 
-    fun resetApiError() { _apiError.value = null }
+    fun resetApiError() { _repositoryOperationError.value = null }
 }

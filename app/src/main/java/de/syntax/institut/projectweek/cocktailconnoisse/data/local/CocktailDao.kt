@@ -15,14 +15,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CocktailDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCachedCocktail(cocktail: Cocktail)
-
     @Update
-    suspend fun updateCachedCocktail(cocktail: Cocktail)
+    suspend fun updateCocktail(cocktail: Cocktail)
 
     @Delete
-    suspend fun deleteCachedCocktail(cocktail: Cocktail)
+    suspend fun deleteCocktail(cocktail: Cocktail)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCachedCocktail(cocktail: Cocktail)
 
     @Transaction
     @Query("SELECT * FROM cocktail")
@@ -49,7 +49,7 @@ interface CocktailDao {
 
     @Transaction
     @Query("SELECT * FROM cocktail WHERE favorited = 1")
-    fun getAllFavorites(): Flow<List<CocktailWithIngredients>>
+    fun getFavorites(): Flow<List<CocktailWithIngredients>>
 
     @Transaction
     suspend fun insertCachedCocktailWithIngredients(
@@ -66,12 +66,23 @@ interface CocktailDao {
         clearCachedCocktails()
     }
 
+    // mit flow und ohne suspend weil ein Flow schon asynchron ist
     @Transaction
     @Query("SELECT * FROM cocktail WHERE id = :cocktailId")
     suspend fun getCocktailWithIngredients(cocktailId: Long): CocktailWithIngredients
 
+    // mit flow und ohne suspend weil ein Flow schon asynchron ist
     @Transaction
     @Query("SELECT * FROM cocktail")
     suspend fun getAllCocktailsWithIngredients(): List<CocktailWithIngredients>
 
+
+
+    // new
+
+
+
+    @Transaction
+    @Query("SELECT * FROM cocktail where id = :id")
+    fun getCocktailById(id: String): Flow<CocktailWithIngredients?>
 }

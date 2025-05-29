@@ -1,6 +1,7 @@
 package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -96,12 +97,15 @@ object Home : AppRouteTab, AppRouteContent {
             viewModel?.let { viewModelHome ->
 
                 val viewModelState by viewModelHome.state.collectAsState()
-                val apiError by viewModelHome.apiError.collectAsState()
+                val apiError by viewModelHome.repositoryOperationError.collectAsState()
                 val cocktail = viewModelHome.randomCocktail.collectAsState().value
                 val cocktails = viewModelHome.randomCocktails.collectAsState().value
-                val updatedCocktail = viewModelHome.updatedCocktail.collectAsState()
 
-                LaunchedEffect(Unit, updatedCocktail) {
+// TODO sts 29.05.25 - removed
+//
+//                val updatedCocktail = viewModelHome.updatedCocktail.collectAsState()
+//                LaunchedEffect(Unit, updatedCocktail) {
+                LaunchedEffect(Unit) {
 
                     if (viewModelState == ViewModelState.READY) {
 
@@ -258,23 +262,23 @@ object Home : AppRouteTab, AppRouteContent {
                                     !cocktail.isAlcoholic
                                 }
                             }) { cocktail ->
-                                CocktailItemLarge(cocktail, navController, { viewModelHome.updateFavorite(cocktail) })
+                                CocktailItemLarge(cocktail, navController)
                             }
                         }
                     }
                 } else {
-                    CocktailItem(cocktail, navController, viewModelHome)
+                    CocktailItem(cocktail, navController)
 
                     Spacer(Modifier.height(10.dp))
 
-                    CocktailList(cocktails, navController, viewModelHome)
+                    CocktailList(cocktails, navController)
                 }
             } else {
-                CocktailItem(cocktail, navController, viewModelHome)
+                CocktailItem(cocktail, navController)
 
                 Spacer(Modifier.height(10.dp))
 
-                CocktailList(cocktails, navController, viewModelHome)
+                CocktailList(cocktails, navController)
             }
         }
     }
@@ -282,8 +286,7 @@ object Home : AppRouteTab, AppRouteContent {
     @Composable
     private fun CocktailItem(
         cocktail: Cocktail,
-        navController: NavHostController,
-        viewModel: HomeViewModel
+        navController: NavHostController
     ) {
 
         Text(
@@ -317,12 +320,12 @@ object Home : AppRouteTab, AppRouteContent {
                         url = cocktail.imageUrl
                     )
 
+                    Log.d("STS::Home Screen", "CocktailItem: ${cocktail.id}")
                     FavoriteSwitch(
-                        modifier = Modifier
+                        Modifier
                             .align(Alignment.TopEnd)
                             .padding(8.dp),
-                        cocktail = cocktail,
-                        onFavoriteChange = { viewModel.updateFavorite(cocktail) }
+                        cocktail.id
                     )
                 }
             }
@@ -337,8 +340,7 @@ object Home : AppRouteTab, AppRouteContent {
     @Composable
     private fun CocktailList(
         cocktails: List<Cocktail>,
-        navController: NavHostController,
-        viewModel: HomeViewModel
+        navController: NavHostController
     ) {
 
         Row(
@@ -372,7 +374,7 @@ object Home : AppRouteTab, AppRouteContent {
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             contentPadding = PaddingValues(5.dp)
         ) {
-            items(cocktails.take(10)) { cocktailItem ->
+            items(cocktails.take(10)) {
 
                 Box(
                     Modifier.fillMaxWidth()
@@ -393,25 +395,25 @@ object Home : AppRouteTab, AppRouteContent {
                                         navController.navigate(
                                             Details.route.replace(
                                                 "{id}",
-                                                cocktailItem.id.toString()
+                                                it.id.toString()
                                             )
                                         )
                                     },
-                                url = cocktailItem.imageUrl
+                                url = it.imageUrl
                             )
 
+                            Log.d("STS::Home Screen", "CocktailList: ${it.id}")
                             FavoriteSwitch(
-                                modifier = Modifier
+                                Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(8.dp),
-                                cocktail = cocktailItem,
-                                onFavoriteChange = { viewModel.updateFavorite(cocktailItem) }
+                                it.id
                             )
                         }
                     }
 
                     TextWithShadow(
-                        text = cocktailItem.name,
+                        text = it.name,
                         fontSize = 16.sp
                     )
                 }

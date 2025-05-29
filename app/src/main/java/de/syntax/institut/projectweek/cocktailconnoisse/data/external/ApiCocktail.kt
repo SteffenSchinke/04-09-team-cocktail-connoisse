@@ -28,12 +28,12 @@ class ApiCocktail(
         @GET("search.php")
         suspend fun getCocktailsByName(@Query("s") name: String): Response<ResponseCocktailDto>
 
-        @GET("list.php?c=list")
-        suspend fun getAllCategories(): Response<ResponseCategoryDto>
-        
         @GET("filter.php")
         suspend fun getCocktailsByCategory(@Query("c") category: String): Response<ResponseCocktailDto>
 
+        @GET("list.php?c=list")
+        suspend fun getCategories(): Response<ResponseCategoryDto>
+        
         @GET("filter.php")
         suspend fun getCocktailsByIngredient(@Query("i") ingredient: String): Response<ResponseCocktailDto>
 

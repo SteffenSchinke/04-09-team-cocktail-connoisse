@@ -79,13 +79,13 @@ object Favorites : AppRouteTab, AppRouteContent {
             viewModel?.let { viewModelFavorite ->
 
                 val viewModelState by viewModelFavorite.state.collectAsState()
-                val apiError by viewModelFavorite.apiError.collectAsState()
+                val apiError by viewModelFavorite.repositoryOperationError.collectAsState()
                 val cocktails = viewModelFavorite.cocktails.collectAsState().value
 
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, viewModelFavorite, cocktails)
+                        Content(navController, cocktails)
                     }
 
                     ViewModelState.WORKING -> {
@@ -137,7 +137,6 @@ object Favorites : AppRouteTab, AppRouteContent {
     @Composable
     private fun Content(
         navController: NavHostController,
-        viewModel: FavoritesViewModel,
         cocktails: List<Cocktail>
     ) {
 
@@ -209,27 +208,17 @@ object Favorites : AppRouteTab, AppRouteContent {
                                 text = cocktail.name,
                                 fontSize = 16.sp
                             )
-                            Column(
-                                Modifier
-                                    .fillMaxSize()
 
+                            Column(
+                                Modifier.fillMaxSize()
                             ) {
                                 Row(
                                     Modifier
                                         .fillMaxSize()
                                         .padding(8.dp),
-                                        //.align(Alignment.BottomEnd)
                                         verticalAlignment = Alignment.Bottom,
                                     horizontalArrangement = Arrangement.End
-                                ) {
-
-                                    FavoriteSwitch(
-                                        modifier = Modifier
-                                            .padding(8.dp),
-                                        cocktail = cocktail,
-                                        onFavoriteChange = { viewModel.updateIsFavorited(it) }
-                                    )
-                                }
+                                ) { FavoriteSwitch(Modifier.padding(8.dp), cocktail.id) }
                             }
                         }
                     }

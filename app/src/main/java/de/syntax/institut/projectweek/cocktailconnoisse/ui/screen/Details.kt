@@ -73,7 +73,7 @@ object Details : AppRoute, AppRouteContent {
             viewModel?.let { viewModel ->
 
                 val viewModelState by viewModel.state.collectAsState()
-                val apiError by viewModel.apiError.collectAsState()
+                val apiError by viewModel.repositoryOperationError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val id = navBackStackEntry?.arguments?.getString("id") ?: ""
 
@@ -181,12 +181,7 @@ object Details : AppRoute, AppRouteContent {
                     url = it.imageUrl
                 )
 
-                FavoriteSwitch(
-                    modifier = Modifier
-                        .padding(8.dp),
-                    cocktail = it,
-                    onFavoriteChange = { viewModel.updateIsFavorited(it) }
-                )
+                FavoriteSwitch(Modifier.padding(8.dp), it.id)
             }
         }
 

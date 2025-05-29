@@ -7,15 +7,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Cocktail::class, Ingredient::class], version = 1, exportSchema = false)
+@Database(entities = [Cocktail::class, Ingredient::class, Category::class], version = 1, exportSchema = false)
 abstract class CocktailDatabase : RoomDatabase() {
 
     abstract fun cocktailDao(): CocktailDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         @Volatile
@@ -44,6 +46,7 @@ abstract class CocktailDatabase : RoomDatabase() {
                             if (!prefs.getBoolean("db_initialized", false)) {
                                 db.cocktailDao().clearCachedCocktails()
                                 db.cocktailDao().clearCachedIngredients()
+                                db.categoryDao().clearCache()
                                 prefs.edit { putBoolean("db_initialized", true) }
                             }
                         }

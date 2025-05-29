@@ -10,6 +10,8 @@ import de.schinke.steffen.enums.SnackbarMode
 import de.schinke.steffen.enums.ViewModelState
 import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.services.AppSnackbar
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepository
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.dataStore
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,11 +29,13 @@ private val DATASTORE_IS_NOTIFICATION_ERROR = booleanPreferencesKey("isNotificat
 class SettingsViewModel(
 
     application: Application,
-    private val cocktailDao: CocktailRepositoryInterface
+    private val cocktailRepo: CocktailRepositoryInterface
 ) : AppBaseViewModelAndroid<ViewModelState>(application, ViewModelState.READY) {
 
     private val _dataStore = application.dataStore
     private val _scope = viewModelScope
+
+    // TODO sts 25.05.25 - make all string localize
 
     init {
 
@@ -50,7 +54,8 @@ class SettingsViewModel(
         }
     }
 
-    val isCacheEmpty: StateFlow<Boolean> = cocktailDao.isCacheEmpty()
+    // TODO sts 25.05.25 - ask nick is conform!!!
+    val isCacheEmpty: StateFlow<Boolean> = (cocktailRepo as CocktailRepository).isCacheEmpty()
         .stateIn( _scope, SharingStarted.WhileSubscribed(), true)
 
     val isDarkTheme: StateFlow<Boolean> = _dataStore.data
@@ -116,8 +121,6 @@ class SettingsViewModel(
 
     fun toggleIsNotificationTip(newValue: Boolean) {
 
-        // TODO sts 25.05.25 - implement useful hints for app
-
         viewModelScope.launch {
             _dataStore.edit { prefs ->
                 prefs[DATASTORE_IS_NOTIFICATION_TIP] = newValue
@@ -142,19 +145,6 @@ class SettingsViewModel(
                 duration = SnackbarDisplayTime.INDEFINITE
             )
         }
-
-//
-//        viewModelScope.launch {
-//            _dataStore.edit { prefs ->
-//                prefs[DATASTORE_IS_NOTIFICATION_TIP] = newValue
-//            }
-//            configSnackbarMode(newValue, SnackbarMode.TIP)
-//
-//            sendMessageOnSnackbar(
-//                if (newValue) "Benachrichtigungen für Hinweise wurde aktiviert"
-//                else "Benachrichtigungen für Hinweise wurde deaktiviert"
-//            )
-//        }
     }
 
     fun toggleIsNotificationError(newValue: Boolean) {
@@ -174,30 +164,39 @@ class SettingsViewModel(
 
     fun deleteCache() {
 
+        if (state.value != ViewModelState.READY) return
+
         viewModelScope.launch {
 
-            cocktailDao.truncateCache()
+            try {
 
-            sendMessageOnSnackbar(
-                message = "Cache wurde gelöscht",
-                mode = SnackbarMode.INFO
-            )
+                setState { ViewModelState.WORKING }
+
+                // TODO sts 27.05.25 - alert dialog?!
+                // TODO sts 25.05.25 - ask nick is conform!!!
+                (cocktailRepo as CocktailRepository).clearCache()
+
+                sendMessageOnSnackbar(
+                    message = "Cache wurde gelöscht",
+                    mode = SnackbarMode.INFO
+                )
+
+                setState { ViewModelState.READY }
+            } catch (e: RepositoryOperationError) {
+
+                sendMessageOnSnackbar(
+                    message = e.localizedMessage ?: "api_error_unknown",
+                    mode = SnackbarMode.ERROR
+                )
+                setState { ViewModelState.READY }
+            } catch (e: Exception) {
+                sendMessageOnSnackbar(
+                    message = e.localizedMessage ?: "api_error_unknown",
+                    mode = SnackbarMode.ERROR
+                )
+                setState { ViewModelState.READY }
+            }
         }
-
-        // TODO sts 27.05.25 - handling ?!?!
-
-//        sendMessageOnSnackbar(
-//            message = "Achtung, du bist dabei die ganzen Cache zu löschen!",
-//            mode = SnackbarMode.TIP,
-//            actionOnNewLine = true,
-//            actionLabel = "Löschen",
-//            duration = SnackbarDisplayTime.INDEFINITE,
-//            actionAction = {
-//                viewModelScope.launch {
-//                    cocktailDao.truncateCache()
-//                }
-//            }
-//        )
     }
 
     private fun configSnackbarMode(newValue: Boolean, mode: SnackbarMode) {

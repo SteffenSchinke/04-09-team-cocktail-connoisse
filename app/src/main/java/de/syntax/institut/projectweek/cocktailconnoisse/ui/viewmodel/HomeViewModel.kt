@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import de.schinke.steffen.base_classs.AppBaseViewModelAndroid
 import de.schinke.steffen.enums.ViewModelState
-import de.syntax.institut.projectweek.cocktailconnoisse.data.external.ApiError
+import de.syntax.institut.projectweek.cocktailconnoisse.data.external.RepositoryOperationError
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
@@ -30,8 +30,8 @@ class HomeViewModel(
 
     // TODO sts 23.05.25 - implement viewmodel database for persistence of cocktails
 
-    private val _apiError = MutableStateFlow<ApiError?>(null)
-    val apiError: StateFlow<ApiError?> = _apiError
+    private val _repositoryOperationError = MutableStateFlow<RepositoryOperationError?>(null)
+    val repositoryOperationError: StateFlow<RepositoryOperationError?> = _repositoryOperationError
 
     private val _cocktailType = MutableStateFlow(CocktailType.ALCOHOLIC)
     val cocktailType: StateFlow<CocktailType> = _cocktailType
@@ -56,32 +56,35 @@ class HomeViewModel(
     var isSearching by mutableStateOf(false)
     var searchText by mutableStateOf("")
 
-    private val _updatedCocktail = MutableStateFlow<Cocktail?>(null)
-    val updatedCocktail: StateFlow<Cocktail?> = _updatedCocktail
-
-    fun updateFavorite(cocktail: Cocktail) {
-        if (state.value != ViewModelState.READY) return
-
-        setState { ViewModelState.WORKING }
-
-        try {
-            viewModelScope.launch {
-                val newCocktail = cocktailRepo.getCocktailById(cocktail.id.toString())
-                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-                newCocktail.value?.let {
-                    it.favorited = !cocktail.favorited
-                    cocktailRepo.updateCachedCocktail(it)
-                    setState { ViewModelState.READY }
-                    _updatedCocktail.value = it
-                }
-                setState { ViewModelState.READY }
-            }
-        } catch (e: ApiError) {
-
-            _apiError.value = e
-            setState { ViewModelState.ERROR }
-        }
-    }
+    // TODO sts 29.05.25 - removed
+//
+//    private val _updatedCocktail = MutableStateFlow<Cocktail?>(null)
+//    val updatedCocktail: StateFlow<Cocktail?> = _updatedCocktail
+//
+//
+//    fun updateFavorite(cocktail: Cocktail) {
+//        if (state.value != ViewModelState.READY) return
+//
+//        setState { ViewModelState.WORKING }
+//
+//        try {
+//            viewModelScope.launch {
+//                val newCocktail = cocktailRepo.getCocktailById(cocktail.id.toString())
+//                    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+//                newCocktail.value?.let {
+//                    it.favorited = !cocktail.favorited
+//                    cocktailRepo.updateCocktail(it)
+//                    setState { ViewModelState.READY }
+//                    _updatedCocktail.value = it
+//                }
+//                setState { ViewModelState.READY }
+//            }
+//        } catch (e: ApiError) {
+//
+//            _apiError.value = e
+//            setState { ViewModelState.ERROR }
+//        }
+//    }
 
     fun loadCocktails() {
 
@@ -106,9 +109,9 @@ class HomeViewModel(
 
                 Log.d("HomeViewModel", "loadCocktails() ready")
                 setState { ViewModelState.READY }
-            } catch (e: ApiError) {
+            } catch (e: RepositoryOperationError) {
 
-                _apiError.value = e
+                _repositoryOperationError.value = e
                 setState { ViewModelState.ERROR }
             }
         }
@@ -123,7 +126,7 @@ class HomeViewModel(
     }
 
     fun resetApiError() {
-        _apiError.value = null
+        _repositoryOperationError.value = null
     }
 
     private var searchJob: Job? = null
@@ -131,7 +134,7 @@ class HomeViewModel(
     fun searchCocktailsByName(name: String) {
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
-            cocktailRepo.getCocktailsByName(name)
+            cocktailRepo.getCocktails(name)
                 .catch { e ->
                     _searchedCocktails.value = emptyList()
                 }
