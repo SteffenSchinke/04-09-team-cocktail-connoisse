@@ -2,7 +2,6 @@ package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
-import de.syntax.institut.projectweek.cocktailconnoisse.data.model.CocktailWithIngredients
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.Flow
