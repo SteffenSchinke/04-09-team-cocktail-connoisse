@@ -11,7 +11,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,11 +28,8 @@ class CategoriesViewModel(
     private val _listForNavigationIds = MutableStateFlow<String?>(null)
     val listForNavigationIds: StateFlow<String?> = _listForNavigationIds
 
-    private val _clickedCategory = MutableStateFlow<Category?>(null)
-    val clickedCategory: StateFlow<Category?> = _clickedCategory
-
-    private val _hasNavigation= MutableStateFlow(false)
-    val hasNavigation: StateFlow<Boolean> = _hasNavigation
+    private var _clickedCategoryName: String? = null
+    val clickedCategoryName = _clickedCategoryName
 
     val categories: StateFlow<List<Category>> =
         cocktailRepo.getCategories()
@@ -53,15 +49,13 @@ class CategoriesViewModel(
             try {
                 cocktailRepo.getCocktails(category).collect { cocktails ->
 
-                        val listIds = cocktails.map { it.id.toString() }
+                    val listIds = cocktails.map { it.id.toString() }
 
-                        _clickedCategory.value = category
-                        _listForNavigationIds.value = listIds.joinToString(",")
+                    _clickedCategoryName = category.name
+                    _listForNavigationIds.value = listIds.joinToString(",")
 
-                    setState { ViewModelState.READY }
-
-                        cancel()
-                    }
+                    cancel()
+                }
             } catch (e: RepositoryError) {
 
                 _repoError.value = e
@@ -74,11 +68,8 @@ class CategoriesViewModel(
         _repoError.value = null
     }
 
-    fun setNavigation() {
-        _hasNavigation.value = true
-    }
-
-    fun resetNavigation() {
+    fun resetListForNavigationIds() {
         _listForNavigationIds.value = null
+        setState { ViewModelState.READY }
     }
 }

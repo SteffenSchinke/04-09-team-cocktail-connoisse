@@ -78,21 +78,19 @@ object Categories : AppRouteTab, AppRouteContent {
                 val listForNavigationIds by viewModel.listForNavigationIds.collectAsState()
 
                 LaunchedEffect(listForNavigationIds) {
-                    if (listForNavigationIds != null && !viewModel.hasNavigation.value) {
 
+                    listForNavigationIds?.let {
                         Log.d("Categories", "listForNavigationIds: $listForNavigationIds")
-
-                        viewModel.setNavigation()
 
                         val route = Cocktails.route
                             .replace("{ids}", listForNavigationIds!!)
-                            .replace("{top_bar_title}",
-                                viewModel.clickedCategory.value?.name ?: "Cocktails"
+                            .replace(
+                                "{top_bar_title}",
+                                viewModel.clickedCategoryName ?: "Cocktails"
                             )
 
                         navController.navigate(route)
-
-                        viewModel.resetNavigation()
+                        viewModel.resetListForNavigationIds()
                     }
                 }
 
@@ -178,11 +176,13 @@ object Categories : AppRouteTab, AppRouteContent {
                             viewModel.onCategoryClick(it)
                         }
                     }
+
                     2 -> {
                         CategoryRowTwice(chunk[0], chunk[1]) {
                             viewModel.onCategoryClick(it)
                         }
                     }
+
                     3 -> {
                         CategoryRow(chunk[0]) {
                             viewModel.onCategoryClick(it)
