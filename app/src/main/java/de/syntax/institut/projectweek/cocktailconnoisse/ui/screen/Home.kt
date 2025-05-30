@@ -278,54 +278,5 @@ object Home : AppRouteTab, AppRouteContent {
             }
         }
     }
-
-//    @Composable
-//    private fun CocktailItem(
-//        cocktail: Cocktail,
-//        navController: NavHostController
-//    ) {
-//
-//
-//        Spacer(Modifier.height(20.dp))
-//
-//        Box(
-//            Modifier
-//                .fillMaxWidth()
-//                .padding(start = 6.dp)
-//        ) {
-//            CostumShadowBox(
-//                elevation = 6.dp,
-//                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-//                cornerRadius = 12.dp,
-//                shadowColor = MaterialTheme.colorScheme.secondary
-//            ) {
-//                Box {
-//                    CostumAsyncImage(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(250.dp)
-//                            .clickable {
-//                                navController.navigate(
-//                                    Details.route.replace("{id}", cocktail.id.toString())
-//                                )
-//                            },
-//                        url = cocktail.imageUrl
-//                    )
-//
-//                    FavoriteSwitch(
-//                        Modifier
-//                            .align(Alignment.TopEnd)
-//                            .padding(8.dp),
-//                        cocktail.id
-//                    )
-//                }
-//            }
-//
-//            TextWithShadow(
-//                text = cocktail.name,
-//                fontSize = 16.sp
-//            )
-//        }
-//    }
 }
 

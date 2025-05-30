@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import de.syntax.institut.projectweek.cocktailconnoisse.R
@@ -40,9 +41,9 @@ internal fun FavoriteSwitch(
             modifier = modifier.clickable { viewModel.updateFavoriteState() }
         ) {
             if (it.favorited)
-                Image(painterOn, contentDescription = descOn)
+                Image(painterOn, contentDescription = descOn, Modifier.scale(1.2f))
             else
-                Image(painterOff, contentDescription = descOff)
+                Image(painterOff, contentDescription = descOff, Modifier.scale(1.2f))
         }
     }
 }

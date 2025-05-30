@@ -181,7 +181,7 @@ object Details : AppRoute, AppRouteContent {
                     url = it.imageUrl
                 )
 
-                FavoriteSwitch(Modifier.padding(8.dp), it.id)
+                FavoriteSwitch(Modifier.padding(12.dp), it.id)
             }
         }
 

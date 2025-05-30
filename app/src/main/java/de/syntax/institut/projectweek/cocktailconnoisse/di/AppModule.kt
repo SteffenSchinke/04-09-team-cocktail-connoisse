@@ -69,16 +69,12 @@ val appModule = module {
 
     Log.d("KoinModule", "FavoriteSwitchViewModel")
     viewModel { (cocktailId: Long) ->
-
-        Log.d("KoinModule", "Creating FSwitchVM for ID: $cocktailId. Koin instance: ${this.hashCode()}")
-
         FavoriteSwitchViewModel(
             application = get(),
             cocktailRepo = get(),
             cocktailId = cocktailId
         )
     }
-
 
     Log.d("KoinModule", "end AppModule")
 }

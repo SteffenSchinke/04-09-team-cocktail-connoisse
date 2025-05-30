@@ -63,7 +63,7 @@ internal fun CocktailItemSmall(
                     .padding(8.dp),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.End
-            ) { FavoriteSwitch(Modifier.padding(8.dp), cocktail.id) }
+            ) { FavoriteSwitch(Modifier.padding(12.dp), cocktail.id) }
         }
     }
 }

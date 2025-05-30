@@ -52,14 +52,6 @@ class CocktailRepository(
         )
     }
 
-    override fun getCategories(): Flow<List<Category>> = categoryDao.getCategories()
-        .catch { e ->
-            throw RepositoryError(
-                type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
-                innerMessage = e.localizedMessage
-            )
-        }
-
     override fun getCocktail(): Flow<Cocktail?> = flow {
 
         try {
@@ -141,6 +133,14 @@ class CocktailRepository(
             )
         }
     }
+
+    override fun getCategories(): Flow<List<Category>> = categoryDao.getCategories()
+        .catch { e ->
+            throw RepositoryError(
+                type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
+                innerMessage = e.localizedMessage
+            )
+        }
 
     override fun getCocktails(listIds: List<Long>): Flow<List<Cocktail>> = flow {
 

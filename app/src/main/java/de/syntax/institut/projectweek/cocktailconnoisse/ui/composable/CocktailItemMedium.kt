@@ -46,7 +46,7 @@ fun CocktailItemMedium(
                 FavoriteSwitch(
                     Modifier
                         .align(Alignment.TopEnd)
-                        .padding(8.dp),
+                        .padding(12.dp),
                     cocktail.id
                 )
             }

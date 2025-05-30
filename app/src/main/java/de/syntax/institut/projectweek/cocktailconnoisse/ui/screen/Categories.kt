@@ -73,55 +73,26 @@ object Categories : AppRouteTab, AppRouteContent {
             viewModel?.let { viewModel ->
 
                 val viewModelState by viewModel.state.collectAsState()
-                val apiError by viewModel.error.collectAsState()
+                val apiError by viewModel.repoError.collectAsState()
                 val categories by viewModel.categories.collectAsState()
                 val listForNavigationIds by viewModel.listForNavigationIds.collectAsState()
 
-//                val hasNavigated by viewModel.hasNavigated.collectAsState()
-//                val cocktailsByCategory by viewModel.cocktailsByCategory.collectAsState()
-//                val lifecycleOwner = LocalLifecycleOwner.current
-
-//                DisposableEffect(lifecycleOwner) {
-//                    val observer = LifecycleEventObserver { _, event ->
-//                        if (event == Lifecycle.Event.ON_RESUME) {
-//                            viewModel.resetNavigationFlag()
-//                        }
-//                    }
-//
-//                    val lifecycle = lifecycleOwner.lifecycle
-//                    lifecycle.addObserver(observer)
-//
-//                    onDispose {
-//                        lifecycle.removeObserver(observer)
-//                    }
-//                }
-
-//                LaunchedEffect(cocktailsByCategory, hasNavigated) {
-//                    if (cocktailsByCategory.isNotEmpty() && !hasNavigated) {
-//                        val route = Cocktails.route
-//                            .replace(
-//                                "{ids}", cocktailsByCategory
-//                                    .shuffled()
-//                                    .take(30)
-//                                    .joinToString(",") { it.id.toString() })
-//                            .replace("{top_bar_title}", viewModel.navigatedCategory.value)
-//
-//                        navController.navigate(route)
-//                        viewModel.setNavigationFlag()
-//                    }
-//                }
-
                 LaunchedEffect(listForNavigationIds) {
+                    if (listForNavigationIds != null && !viewModel.hasNavigation.value) {
 
-                    listForNavigationIds?.let {
+                        Log.d("Categories", "listForNavigationIds: $listForNavigationIds")
+
+                        viewModel.setNavigation()
+
                         val route = Cocktails.route
-                            .replace("{ids}", it)
+                            .replace("{ids}", listForNavigationIds!!)
                             .replace("{top_bar_title}",
                                 viewModel.clickedCategory.value?.name ?: "Cocktails"
                             )
 
-                        Log.d("Categories Screen", "navigate to: $route")
-                        // navController.navigate(route)
+                        navController.navigate(route)
+
+                        viewModel.resetNavigation()
                     }
                 }
 
