@@ -28,7 +28,9 @@ internal fun CocktailItemLarge (
         Spacer(Modifier.height(20.dp))
 
         Box(
-            Modifier.fillMaxWidth().padding(start = 6.dp)
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 6.dp)
         ) {
             CostumShadowBox(
                 elevation = 6.dp,

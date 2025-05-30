@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -143,8 +144,28 @@ class CocktailRepository(
 
     override fun getCocktails(listIds: List<Long>): Flow<List<Cocktail>> = flow {
 
-        // TODO sts 29.0525 - implement
-        emit(emptyList<Cocktail>())
+        try {
+
+            val result = mutableListOf<Cocktail>()
+            for (id in listIds) {
+
+                val cocktail = getCocktail(id).firstOrNull()
+
+                cocktail?.let {
+                    result += it
+                }
+            }
+            emit(result.toList())
+        } catch (e: RepositoryError) {
+
+            throw e
+        } catch (e: Exception) {
+
+            throw RepositoryError(
+                type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
+                innerMessage = e.localizedMessage,
+            )
+        }
     }
 
     override fun getCocktails(count: Int): Flow<List<Cocktail>> = flow {

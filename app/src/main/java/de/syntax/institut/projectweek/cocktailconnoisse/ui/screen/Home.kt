@@ -2,11 +2,8 @@ package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 
 import android.os.Bundle
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -27,7 +23,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -59,7 +54,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemLarge
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemMedium
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailListMedium
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.TextWithShadow
@@ -101,10 +96,6 @@ object Home : AppRouteTab, AppRouteContent {
                 val cocktail = viewModelHome.cocktail.collectAsState().value
                 val cocktails = viewModelHome.cocktails.collectAsState().value
 
-// TODO sts 29.05.25 - removed
-//
-//                val updatedCocktail = viewModelHome.updatedCocktail.collectAsState()
-//                LaunchedEffect(Unit, updatedCocktail) {
                 LaunchedEffect(Unit) {
 
                     if (viewModelState == ViewModelState.READY) {
@@ -267,124 +258,81 @@ object Home : AppRouteTab, AppRouteContent {
                         }
                     }
                 } else {
-                    CocktailItem(cocktail, navController)
+
+                    Text(
+                        text = stringResource(R.string.label_home_title1),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+
+                    CocktailItemLarge(cocktail, navController)
 
                     Spacer(Modifier.height(10.dp))
 
-                    CocktailList(cocktails, navController)
+                    CocktailListMedium(cocktails, navController)
                 }
             } else {
-                CocktailItem(cocktail, navController)
+
+                Text(
+                    text = stringResource(R.string.label_home_title1),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+
+                CocktailItemLarge(cocktail, navController)
 
                 Spacer(Modifier.height(10.dp))
 
-                CocktailList(cocktails, navController)
+                CocktailListMedium(cocktails, navController)
             }
         }
     }
 
-    @Composable
-    private fun CocktailItem(
-        cocktail: Cocktail,
-        navController: NavHostController
-    ) {
-
-        Text(
-            text = stringResource(R.string.label_home_title1),
-            style = MaterialTheme.typography.headlineSmall
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .padding(start = 6.dp)
-        ) {
-            CostumShadowBox(
-                elevation = 6.dp,
-                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
-                cornerRadius = 12.dp,
-                shadowColor = MaterialTheme.colorScheme.secondary
-            ) {
-                Box {
-                    CostumAsyncImage(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(250.dp)
-                            .clickable {
-                                navController.navigate(
-                                    Details.route.replace("{id}", cocktail.id.toString())
-                                )
-                            },
-                        url = cocktail.imageUrl
-                    )
-
-                    FavoriteSwitch(
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(8.dp),
-                        cocktail.id
-                    )
-                }
-            }
-
-            TextWithShadow(
-                text = cocktail.name,
-                fontSize = 16.sp
-            )
-        }
-    }
-
-    @Composable
-    private fun CocktailList(
-        cocktails: List<Cocktail>,
-        navController: NavHostController
-    ) {
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.label_home_title2),
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            TextButton(
-                onClick = {
-
-                    val route = Cocktails.route
-                        .replace("{ids}", cocktails
-                            .shuffled()
-                            .take(30)
-                            .joinToString(",") { it.id.toString() })
-                        .replace("{top_bar_title}", "sheet_suggestions")
-                    navController.navigate(route)
-                },
-                content = { Text(stringResource(R.string.label_home_title3)) }
-            )
-        }
-
-        Spacer(Modifier.height(10.dp))
-
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
-            contentPadding = PaddingValues(5.dp)
-        ) {
-            items(cocktails) { cocktail ->
-
-                CocktailItemMedium(cocktail) {
-                    navController.navigate(
-                        Details.route.replace(
-                            "{id}",
-                            cocktail.id.toString()
-                        )
-                    )
-                }
-            }
-        }
-    }
+//    @Composable
+//    private fun CocktailItem(
+//        cocktail: Cocktail,
+//        navController: NavHostController
+//    ) {
+//
+//
+//        Spacer(Modifier.height(20.dp))
+//
+//        Box(
+//            Modifier
+//                .fillMaxWidth()
+//                .padding(start = 6.dp)
+//        ) {
+//            CostumShadowBox(
+//                elevation = 6.dp,
+//                shadowPositions = setOf(ShadowPosition.TOP, ShadowPosition.LEFT),
+//                cornerRadius = 12.dp,
+//                shadowColor = MaterialTheme.colorScheme.secondary
+//            ) {
+//                Box {
+//                    CostumAsyncImage(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(250.dp)
+//                            .clickable {
+//                                navController.navigate(
+//                                    Details.route.replace("{id}", cocktail.id.toString())
+//                                )
+//                            },
+//                        url = cocktail.imageUrl
+//                    )
+//
+//                    FavoriteSwitch(
+//                        Modifier
+//                            .align(Alignment.TopEnd)
+//                            .padding(8.dp),
+//                        cocktail.id
+//                    )
+//                }
+//            }
+//
+//            TextWithShadow(
+//                text = cocktail.name,
+//                fontSize = 16.sp
+//            )
+//        }
+//    }
 }
 
