@@ -76,7 +76,7 @@ class CocktailRepository(
 
             val cocktail = dtoResponse.toDomain()
             cocktailDao.upsertCocktail(cocktail)
-            ingredientDao.insertIngredients(cocktail.ingredients)
+            ingredientDao.upsertIngredients(cocktail.ingredients)
 
             emit(cocktail)
         } catch (e: RepositoryError) {
@@ -92,36 +92,38 @@ class CocktailRepository(
     }
 
     override fun getCocktail(id: Long): Flow<Cocktail?> = flow {
+
         try {
+
             val cachedCocktail = cocktailDao.getCocktail(id.toString()).first()
-            if (cachedCocktail != null) {
-
-                val cocktail = cachedCocktail.cocktail.apply {
-                    ingredients = cachedCocktail.ingredients
+            cachedCocktail?.let {
+                val cocktail = it.cocktail.apply {
+                    ingredients = it.ingredients
                 }
                 emit(cocktail)
-            } else {
-
-                val response = cocktailApi.apiCocktailService.getCocktailById(id.toString())
-                if (!response.isSuccessful) {
-                    throw RepositoryError(
-                        type = RepositoryErrorType.RESPONSE_FAILED,
-                        responseCode = response.code(),
-                        innerMessage = "api_error_response"
-                    )
-                }
-                val cocktailDto = response.body()?.cocktails?.firstOrNull()
-                    ?: throw RepositoryError(
-                        type = RepositoryErrorType.PARSING_FAILED,
-                        innerMessage = "api_error_parse"
-                    )
-                val cocktail = cocktailDto.toDomain()
-                if (cocktail.instructions != null && cocktail.modifiedAt != null) {
-                    cocktailDao.upsertCocktail(cocktail)
-                    ingredientDao.insertIngredients(cocktail.ingredients)
-                }
-                emit(cocktail)
+                return@flow
             }
+
+            val response = cocktailApi.apiCocktailService.getCocktailById(id.toString())
+            if (!response.isSuccessful) {
+                throw RepositoryError(
+                    type = RepositoryErrorType.RESPONSE_FAILED,
+                    responseCode = response.code(),
+                    innerMessage = "api_error_response"
+                )
+            }
+            val cocktailDto = response.body()?.cocktails?.firstOrNull()
+                ?: throw RepositoryError(
+                    type = RepositoryErrorType.PARSING_FAILED,
+                    innerMessage = "api_error_parse"
+                )
+            val cocktail = cocktailDto.toDomain()
+            if (cocktail.instructions != null && cocktail.modifiedAt != null) {
+                cocktailDao.upsertCocktail(cocktail)
+                ingredientDao.upsertIngredients(cocktail.ingredients)
+            }
+
+            emit(cocktail)
         } catch (_: CancellationException) {
             // flow cancelled bei first() || firstOrNull()
         } catch (e: RepositoryError) {
@@ -212,7 +214,7 @@ class CocktailRepository(
                     )
 
                 cocktailDao.upsertCocktail(cocktail)
-                ingredientDao.insertIngredients(cocktail.ingredients)
+                ingredientDao.upsertIngredients(cocktail.ingredients)
                 cocktails.add(cocktail)
             }
 
@@ -298,7 +300,7 @@ class CocktailRepository(
 
                 val cocktail = it.toDomain()
                 cocktailDao.upsertCocktail(cocktail)
-                ingredientDao.insertIngredients(cocktail.ingredients)
+                ingredientDao.upsertIngredients(cocktail.ingredients)
                 listCocktail.add(cocktail)
             }
 
@@ -374,7 +376,7 @@ class CocktailRepository(
                 val cocktail = it.toDomain()
 
                 cocktailDao.upsertCocktail(cocktail)
-                ingredientDao.insertIngredients(cocktail.ingredients)
+                ingredientDao.upsertIngredients(cocktail.ingredients)
 
                 listCocktail.add(cocktail)
             }
@@ -446,7 +448,7 @@ class CocktailRepository(
                     )
 
                 cocktailDao.upsertCocktail(newCocktail)
-                ingredientDao.insertIngredients(newCocktail.ingredients)
+                ingredientDao.upsertIngredients(newCocktail.ingredients)
 
                 listCocktail.add(newCocktail)
             }
@@ -521,7 +523,7 @@ class CocktailRepository(
         try {
 
             cocktailDao.upsertCocktail(cocktail)
-            ingredientDao.insertIngredients(cocktail.ingredients)
+            ingredientDao.upsertIngredients(cocktail.ingredients)
         } catch (e: Exception) {
 
             throw RepositoryError(
