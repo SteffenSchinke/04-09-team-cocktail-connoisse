@@ -22,8 +22,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,6 +34,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import de.schinke.steffen.enums.SnackbarDisplayTime
+import de.schinke.steffen.enums.SnackbarMode
+import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
 import de.schinke.steffen.interfaces.AppRouteTab
@@ -135,11 +141,11 @@ object Settings : AppRouteTab, AppRouteContent {
                             text = stringResource(R.string.label_cache_hit),
                             style = MaterialTheme.typography.titleMedium
                         )
-                        
+
                         Spacer(Modifier.weight(1f))
 
                         TextButton(
-                            onClick = viewModel::deleteCache,
+                            onClick = { viewModel.showDeleteDialog() },
                             enabled = !isCacheEmpty,
                             content = {
                                 Text(
@@ -147,7 +153,7 @@ object Settings : AppRouteTab, AppRouteContent {
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             }
-                        ) 
+                        )
                     }
 
                     Spacer(Modifier.height(20.dp))

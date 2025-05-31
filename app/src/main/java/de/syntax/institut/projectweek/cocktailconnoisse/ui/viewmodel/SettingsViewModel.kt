@@ -54,7 +54,6 @@ class SettingsViewModel(
         }
     }
 
-    // TODO sts 25.05.25 - ask nick is conform!!!
     val isCacheEmpty: StateFlow<Boolean> = (cocktailRepo as CocktailRepository).isCacheEmpty()
         .stateIn( _scope, SharingStarted.WhileSubscribed(), true)
 
@@ -162,7 +161,21 @@ class SettingsViewModel(
         )
     }
 
-    fun deleteCache() {
+    fun showDeleteDialog() {
+
+        sendMessageOnSnackbar(
+            message = "Soll der komplette Cache der Anwendung wird unwiderruflich gelöscht!",
+            mode = SnackbarMode.QUESTION,
+            actionLabel = "Löschen",
+            actionOnNewLine = true,
+            actionAction = {
+                deleteCache()
+            },
+            duration = SnackbarDisplayTime.INDEFINITE
+        )
+    }
+
+    private fun deleteCache() {
 
         if (state.value != ViewModelState.READY) return
 
@@ -172,8 +185,6 @@ class SettingsViewModel(
 
                 setState { ViewModelState.WORKING }
 
-                // TODO sts 27.05.25 - alert dialog?!
-                // TODO sts 25.05.25 - ask nick is conform!!!
                 (cocktailRepo as CocktailRepository).clearCache()
 
                 sendMessageOnSnackbar(
