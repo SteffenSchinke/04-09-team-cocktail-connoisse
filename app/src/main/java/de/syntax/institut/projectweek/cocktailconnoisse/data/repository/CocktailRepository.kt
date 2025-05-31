@@ -501,35 +501,40 @@ class CocktailRepository(
     override fun getFavorites(): Flow<List<Cocktail>> =
         cocktailDao.getFavorites()
             .map { cocktails ->
-                if (cocktails.isEmpty()) {
-                    throw RepositoryError(
-                        type = RepositoryErrorType.PERSISTENCE_FAILED,
-                        innerMessage = "api_error_response"
-                    )
-                }
                 cocktails.map {
                     it.cocktail.apply { ingredients = it.ingredients }
                 }
             }
             .catch { e ->
-                RepositoryError(
+                emit(emptyList())
+                throw RepositoryError(
                     type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
                     innerMessage = e.localizedMessage ?: "api_error_unknown"
                 )
             }
 
+
     override suspend fun upsertCocktail(cocktail: Cocktail) {
 
         try {
 
+            Log.d("CocktailRepository", "upsertCocktail() cocktail: $cocktail")
+
             cocktailDao.upsertCocktail(cocktail)
-            ingredientDao.upsertIngredients(cocktail.ingredients)
+
+            Log.d("CocktailRepository", "upsertCocktail() ingredient: ${cocktail.ingredients}")
+
+            if (!cocktail.ingredients.isEmpty()) {
+                ingredientDao.upsertIngredients(cocktail.ingredients)
+            }
         } catch (e: Exception) {
 
-            throw RepositoryError(
-                type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
-                innerMessage = e.localizedMessage ?: "api_error_unknown"
-            )
+            Log.d("CocktailRepository", "upsertCocktail() error", e)
+
+//            throw RepositoryError(
+//                type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
+//                innerMessage = e.localizedMessage ?: "api_error_unknown"
+//            )
         }
     }
 

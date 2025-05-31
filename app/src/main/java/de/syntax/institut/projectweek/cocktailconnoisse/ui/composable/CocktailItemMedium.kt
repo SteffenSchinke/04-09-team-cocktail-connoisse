@@ -24,7 +24,7 @@ fun CocktailItemMedium(
 ) {
 
     Box(
-        Modifier.fillMaxWidth()
+        Modifier.width(250.dp)
     ) {
         CostumShadowBox(
             elevation = 6.dp,
@@ -52,6 +52,7 @@ fun CocktailItemMedium(
         }
 
         TextWithShadow(
+            modifier = Modifier.fillMaxWidth(0.85f),
             text = cocktail.name,
             textStyle = MaterialTheme.typography.bodyLarge
         )

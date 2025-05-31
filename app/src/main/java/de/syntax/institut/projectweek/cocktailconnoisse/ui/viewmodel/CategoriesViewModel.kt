@@ -49,7 +49,7 @@ class CategoriesViewModel(
             try {
                 cocktailRepo.getCocktails(category).collect { cocktails ->
 
-                    val listIds = cocktails.map { it.id.toString() }
+                    val listIds = cocktails.take(30).map { it.id.toString() }
 
                     _clickedCategoryName = category.name
                     _listForNavigationIds.value = listIds.joinToString(",")

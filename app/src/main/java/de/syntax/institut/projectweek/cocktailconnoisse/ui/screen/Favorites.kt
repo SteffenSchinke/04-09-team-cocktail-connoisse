@@ -42,7 +42,7 @@ import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemSmall
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemFavorited
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.FavoritesViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -77,7 +77,7 @@ object Favorites : AppRouteTab, AppRouteContent {
                 when (viewModelState) {
 
                     ViewModelState.READY -> {
-                        Content(navController, cocktails)
+                        Content(cocktails, viewModelFavorite, navController)
                     }
 
                     ViewModelState.WORKING -> {
@@ -128,8 +128,9 @@ object Favorites : AppRouteTab, AppRouteContent {
 
     @Composable
     private fun Content(
+        cocktails: List<Cocktail>,
+        viewModel: FavoritesViewModel,
         navController: NavHostController,
-        cocktails: List<Cocktail>
     ) {
 
         Column(
@@ -165,14 +166,18 @@ object Favorites : AppRouteTab, AppRouteContent {
 
                     items(cocktails) { cocktail ->
 
-                        CocktailItemSmall(cocktail) {
-                            navController.navigate(
-                                Details.route.replace(
-                                    "{id}",
-                                    cocktail.id.toString()
+                        CocktailItemFavorited(
+                            cocktail = cocktail,
+                            onUpdateFavoriteState = { viewModel.updateFavoriteState(cocktail)},
+                            onNavigation = {
+                                navController.navigate(
+                                    Details.route.replace(
+                                        "{id}",
+                                        cocktail.id.toString()
+                                    )
                                 )
-                            )
-                        }
+                            }
+                        )
                     }
                 }
             }
