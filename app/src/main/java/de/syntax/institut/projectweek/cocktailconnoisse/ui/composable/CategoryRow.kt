@@ -14,7 +14,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.ui.components.CostumShadowBox
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
@@ -53,7 +52,7 @@ internal fun CategoryRow (
 
         TextWithShadow(
             text = category.name,
-            fontSize = 16.sp
+            textStyle = MaterialTheme.typography.bodyLarge
         )
     }
 }

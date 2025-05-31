@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import de.schinke.steffen.enums.ShadowPosition
 import de.schinke.steffen.ui.components.CostumAsyncImage
 import de.schinke.steffen.ui.components.CostumShadowBox
@@ -54,7 +53,7 @@ fun CocktailItemMedium(
 
         TextWithShadow(
             text = cocktail.name,
-            fontSize = 16.sp
+            textStyle = MaterialTheme.typography.bodyLarge
         )
     }
 }

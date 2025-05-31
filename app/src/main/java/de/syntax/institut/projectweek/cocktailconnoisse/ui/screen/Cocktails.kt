@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
@@ -209,7 +208,7 @@ object Cocktails: AppRoute, AppRouteContent {
                         }
                         TextWithShadow(
                             text = cocktail.name,
-                            fontSize = 16.sp
+                            textStyle = MaterialTheme.typography.bodyLarge
                             )
 
                         Column(
