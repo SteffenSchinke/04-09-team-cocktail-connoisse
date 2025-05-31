@@ -26,6 +26,8 @@ data class Cocktail(
     lateinit var ingredients: List<Ingredient>
 
     companion object {
+
+        @Suppress("unused")
         fun getSample(): Cocktail {
             return Cocktail(
                 id = 0,
@@ -41,6 +43,7 @@ data class Cocktail(
         }
     }
 
+    @Suppress("unused")
     fun toUrlArgument(): String {
 
         return name.replace(" ", "_")

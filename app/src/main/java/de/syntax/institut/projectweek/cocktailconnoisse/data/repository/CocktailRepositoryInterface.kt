@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CocktailRepositoryInterface {
 
-    suspend fun insertCocktail(cocktail: Cocktail)
+    suspend fun upsertCocktail(cocktail: Cocktail)
 
     suspend fun deleteCocktail(cocktail: Cocktail)
 
