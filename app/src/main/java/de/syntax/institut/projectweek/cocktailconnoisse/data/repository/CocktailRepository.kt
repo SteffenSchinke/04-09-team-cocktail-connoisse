@@ -442,11 +442,20 @@ class CocktailRepository(
     fun clearCache() {
 
         scope.launch {
-            cocktailDao.truncateCocktail()
-            ingredientDao.truncateIngredients()
-            categoryDao.truncateCategory()
 
-            buildCategoryCash()
+            try {
+                cocktailDao.truncateCocktail()
+                ingredientDao.truncateIngredients()
+                categoryDao.truncateCategory()
+
+                buildCategoryCash()
+            } catch (e: Exception) {
+
+                throw RepositoryError(
+                    type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
+                    innerMessage = e.localizedMessage ?: "api_error_unknown"
+                )
+            }
         }
     }
 
