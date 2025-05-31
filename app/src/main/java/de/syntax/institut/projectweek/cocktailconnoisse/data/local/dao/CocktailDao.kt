@@ -25,7 +25,11 @@ interface CocktailDao {
 
     @Transaction
     @Query("SELECT * FROM cocktail where id = :id")
-    fun getCocktail(id: String): Flow<CocktailWithIngredients?>
+    fun getCocktail(id: Long): Flow<CocktailWithIngredients?>
+
+    @Transaction
+    @Query("SELECT * FROM cocktail where name = :name")
+    fun getCocktail(name: String): Flow<CocktailWithIngredients?>
 
     @Transaction
     @Query("SELECT * FROM cocktail")

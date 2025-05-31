@@ -10,6 +10,7 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.local.dao.CocktailD
 import de.syntax.institut.projectweek.cocktailconnoisse.data.local.dao.IngredientDao
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 class CocktailRepository(
 
@@ -66,10 +68,11 @@ class CocktailRepository(
             }
 
             val dtoResponse =
-                response.body()?.cocktails?.firstOrNull() ?: throw RepositoryError(
-                    type = RepositoryErrorType.PARSING_FAILED,
-                    innerMessage = "api_error_parse"
-                )
+                response.body()?.cocktails?.firstOrNull()
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.PARSING_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
 
             val cocktail = dtoResponse.toDomain()
             cocktailDao.insertCocktail(cocktail)
@@ -89,39 +92,38 @@ class CocktailRepository(
     }
 
     override fun getCocktail(id: Long): Flow<Cocktail?> = flow {
-
         try {
+            val cachedCocktail = cocktailDao.getCocktail(id.toString()).first()
+            if (cachedCocktail != null) {
 
-            val cocktailFlow = cocktailDao.getCocktail(id.toString()).first()
-            cocktailFlow?.let {
-                val cocktail = it.cocktail.apply {
-                    ingredients = it.ingredients
+                val cocktail = cachedCocktail.cocktail.apply {
+                    ingredients = cachedCocktail.ingredients
                 }
                 emit(cocktail)
-                return@flow
+            } else {
+
+                val response = cocktailApi.apiCocktailService.getCocktailById(id.toString())
+                if (!response.isSuccessful) {
+                    throw RepositoryError(
+                        type = RepositoryErrorType.RESPONSE_FAILED,
+                        responseCode = response.code(),
+                        innerMessage = "api_error_response"
+                    )
+                }
+                val cocktailDto = response.body()?.cocktails?.firstOrNull()
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.PARSING_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
+                val cocktail = cocktailDto.toDomain()
+                if (cocktail.instructions != null && cocktail.modifiedAt != null) {
+                    cocktailDao.insertCocktail(cocktail)
+                    ingredientDao.insertIngredients(cocktail.ingredients)
+                }
+                emit(cocktail)
             }
-
-            val response = cocktailApi.apiCocktailService.getCocktailById(id.toString())
-            if (!response.isSuccessful) {
-                throw RepositoryError(
-                    type = RepositoryErrorType.RESPONSE_FAILED,
-                    responseCode = response.code(),
-                    innerMessage = "api_error_response"
-                )
-            }
-
-            val cocktailDto =
-                response.body()?.cocktails?.firstOrNull() ?: throw RepositoryError(
-                    type = RepositoryErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
-                )
-            val cocktail = cocktailDto.toDomain()
-
-            if (cocktail.instructions != null && cocktail.modifiedAt != null) {
-                cocktailDao.insertCocktail(cocktail)
-                ingredientDao.insertIngredients(cocktail.ingredients)
-            }
-
-            emit(cocktail)
+        } catch (_: CancellationException) {
+            // flow cancelled bei first() || firstOrNull()
         } catch (e: RepositoryError) {
 
             throw e
@@ -133,6 +135,7 @@ class CocktailRepository(
             )
         }
     }
+
 
     override fun getCategories(): Flow<List<Category>> = categoryDao.getCategories()
         .catch { e ->
@@ -196,13 +199,17 @@ class CocktailRepository(
                     )
                 }
 
-                val dtoResponse = response.body()?.cocktails ?: throw RepositoryError(
-                    type = RepositoryErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
-                )
+                val dtoResponse = response.body()?.cocktails
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.PARSING_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
 
-                val cocktail = dtoResponse.firstOrNull()?.toDomain() ?: throw RepositoryError(
-                    type = RepositoryErrorType.RESPONSE_FAILED, innerMessage = "api_error_parse"
-                )
+                val cocktail = dtoResponse.firstOrNull()?.toDomain()
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.RESPONSE_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
 
                 cocktailDao.insertCocktail(cocktail)
                 ingredientDao.insertIngredients(cocktail.ingredients)
@@ -236,9 +243,11 @@ class CocktailRepository(
                 )
             }
 
-            val dtoResponse = response.body()?.cocktails ?: throw RepositoryError(
-                type = RepositoryErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
-            )
+            val dtoResponse = response.body()?.cocktails
+                ?: throw RepositoryError(
+                    type = RepositoryErrorType.PARSING_FAILED,
+                    innerMessage = "api_error_parse"
+                )
 
             emit(dtoResponse.map { it.toDomain() })
         } catch (e: RepositoryError) {
@@ -278,9 +287,11 @@ class CocktailRepository(
                 )
             }
 
-            val dtoResponse = response.body()?.cocktails ?: throw RepositoryError(
-                type = RepositoryErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
-            )
+            val dtoResponse = response.body()?.cocktails
+                ?: throw RepositoryError(
+                    type = RepositoryErrorType.PARSING_FAILED,
+                    innerMessage = "api_error_parse"
+                )
 
             val listCocktail: MutableList<Cocktail> = mutableListOf()
             dtoResponse.take(count).forEachIndexed { index, it ->
@@ -318,9 +329,11 @@ class CocktailRepository(
                 )
             }
 
-            val dtoResponse = response.body()?.cocktails ?: throw RepositoryError(
-                type = RepositoryErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
-            )
+            val dtoResponse = response.body()?.cocktails
+                ?: throw RepositoryError(
+                    type = RepositoryErrorType.PARSING_FAILED,
+                    innerMessage = "api_error_parse"
+                )
 
             emit(dtoResponse.map { it.toDomain() })
         } catch (e: RepositoryError) {
@@ -349,9 +362,11 @@ class CocktailRepository(
                 )
             }
 
-            val dtoResponse = response.body()?.cocktails ?: throw RepositoryError(
-                type = RepositoryErrorType.PARSING_FAILED, innerMessage = "api_error_parse"
-            )
+            val dtoResponse = response.body()?.cocktails
+                ?: throw RepositoryError(
+                    type = RepositoryErrorType.PARSING_FAILED,
+                    innerMessage = "api_error_parse"
+                )
 
             val listCocktail: MutableList<Cocktail> = mutableListOf()
             dtoResponse.map { it ->
@@ -375,6 +390,85 @@ class CocktailRepository(
             )
         }
     }
+
+    override fun getCocktails(ingredient: Ingredient, count: Int): Flow<List<Cocktail>> = flow {
+
+        try {
+
+            val response =
+                cocktailApi.apiCocktailService.getCocktailsByIngredient(ingredient.toUrlArgument())
+            if (!response.isSuccessful) {
+                throw RepositoryError(
+                    type = RepositoryErrorType.RESPONSE_FAILED,
+                    responseCode = response.code(),
+                    innerMessage = "api_error_response"
+                )
+            }
+
+            val dtoResponse = response.body()?.cocktails
+                ?: throw RepositoryError(
+                    type = RepositoryErrorType.PARSING_FAILED,
+                    innerMessage = "api_error_parse"
+                )
+
+            val listCocktail: MutableList<Cocktail> = mutableListOf()
+            dtoResponse.shuffled().take(count).forEach { it ->
+
+                val cocktail = it.toDomain()
+
+                var newCocktail = cocktailDao.getCocktail(cocktail.id).firstOrNull()?.cocktail
+                newCocktail?.let {
+
+                    listCocktail.add(it)
+                    return@forEach
+                }
+
+                val responseCocktail =
+                    cocktailApi.apiCocktailService.getCocktailById(cocktail.id.toString())
+                if (!responseCocktail.isSuccessful) {
+                    throw RepositoryError(
+                        type = RepositoryErrorType.RESPONSE_FAILED,
+                        responseCode = responseCocktail.code(),
+                        innerMessage = "api_error_response"
+                    )
+                }
+
+                val dtoResponseCocktail = responseCocktail.body()?.cocktails
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.PARSING_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
+
+                newCocktail = dtoResponseCocktail.firstOrNull()?.toDomain()
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.PARSING_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
+
+                newCocktail?.let {
+                    cocktailDao.insertCocktail(it)
+                    ingredientDao.insertIngredients(it.ingredients)
+
+                    listCocktail.add(it)
+                }
+            }
+
+            emit(listCocktail)
+        } catch (_: CancellationException) {
+
+            // flow cancelled bei first() || firstOrNull()
+        } catch (e: RepositoryError) {
+
+            throw e
+        } catch (e: Exception) {
+
+            throw RepositoryError(
+                type = RepositoryErrorType.PERSISTENCE_OPERATION_FAILED,
+                innerMessage = e.localizedMessage,
+            )
+        }
+    }
+
 
     override suspend fun updateCocktail(cocktail: Cocktail) {
 
@@ -477,10 +571,11 @@ class CocktailRepository(
                     )
                 }
 
-                val dtoResponse = response.body()?.category ?: throw RepositoryError(
-                    type = RepositoryErrorType.PARSING_FAILED,
-                    innerMessage = "api_error_parse"
-                )
+                val dtoResponse = response.body()?.category
+                    ?: throw RepositoryError(
+                        type = RepositoryErrorType.PARSING_FAILED,
+                        innerMessage = "api_error_parse"
+                    )
 
                 categoryDao.insertCategories(dtoResponse.map { it.toDomain() })
 

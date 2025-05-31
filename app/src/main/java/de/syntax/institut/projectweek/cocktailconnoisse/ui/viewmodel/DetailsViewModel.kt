@@ -9,7 +9,9 @@ import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
 import de.syntax.institut.projectweek.cocktailconnoisse.data.repository.CocktailRepositoryInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 class DetailsViewModel(
 
@@ -20,6 +22,9 @@ class DetailsViewModel(
     private val _cocktail = MutableStateFlow<Cocktail?>(null)
     val cocktail: StateFlow<Cocktail?> = _cocktail
 
+    private val _cocktails = MutableStateFlow<List<Cocktail>>(emptyList())
+    val cocktails: StateFlow<List<Cocktail>> = _cocktails
+
     private val _repoError = MutableStateFlow<RepositoryError?>(null)
     val repoError: StateFlow<RepositoryError?> = _repoError
 
@@ -27,16 +32,26 @@ class DetailsViewModel(
 
         if (state.value != ViewModelState.READY) return
 
-        setState { ViewModelState.WORKING }
-
         viewModelScope.launch {
 
+            setState { ViewModelState.WORKING }
+
             try {
-                cocktailRepo.getCocktail(id.toLong()).collect { cocktail ->
-                    _cocktail.value = cocktail
+
+                _cocktail.value= cocktailRepo.getCocktail(id.toLong()).first()
+
+                _cocktail.value?.let { cocktail ->
+                    val ingredient = cocktail.ingredients.firstOrNull()
+
+                    ingredient?.let { ingredient ->
+                        val result = cocktailRepo.getCocktails(ingredient, 5).first()
+                        _cocktails.value = result.take(5)
+                    }
                 }
 
                 setState { ViewModelState.READY }
+            } catch (_: CancellationException) {
+                // flow cancelled bei first() || firstOrNull()
             } catch (e: RepositoryError) {
 
                 _repoError.value = e
@@ -45,5 +60,8 @@ class DetailsViewModel(
         }
     }
 
-    fun resetApiError() { _repoError.value = null }
+    fun resetApiError() {
+        _repoError.value = null
+        setState { ViewModelState.READY }
+    }
 }

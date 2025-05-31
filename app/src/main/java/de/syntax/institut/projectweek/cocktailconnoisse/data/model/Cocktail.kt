@@ -40,6 +40,11 @@ data class Cocktail(
             ).apply { ingredients = emptyList() }
         }
     }
+
+    fun toUrlArgument(): String {
+
+        return name.replace(" ", "_")
+    }
 }
 
 

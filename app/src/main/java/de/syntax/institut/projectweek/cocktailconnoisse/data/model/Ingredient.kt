@@ -24,4 +24,10 @@ data class Ingredient(
     val cocktailId: Long,
     val name: String?,
     val measure: String?
-)
+) {
+
+    fun toUrlArgument(): String {
+
+        return name?.replace(" ", "_") ?: ""
+    }
+}

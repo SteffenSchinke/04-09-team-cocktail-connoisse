@@ -3,10 +3,12 @@ package de.syntax.institut.projectweek.cocktailconnoisse.ui.screen
 import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
@@ -34,17 +36,21 @@ import de.schinke.steffen.extensions.sendMessageOnSnackbar
 import de.schinke.steffen.interfaces.AppRoute
 import de.schinke.steffen.interfaces.AppRouteContent
 import de.schinke.steffen.interfaces.AppRouteSheet
-import de.schinke.steffen.ui.components.CostumAsyncImage
 import de.schinke.steffen.ui.components.CostumBackButton
 import de.schinke.steffen.ui.components.CostumErrorImage
 import de.schinke.steffen.ui.components.CostumProgressCircle
 import de.syntax.institut.projectweek.cocktailconnoisse.R
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import de.syntax.institut.projectweek.cocktailconnoisse.extension.getStringResourceByName
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailItemDetail
+import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CocktailListByIngredient
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.CostumTopBarBackground
-import de.syntax.institut.projectweek.cocktailconnoisse.ui.composable.FavoriteSwitch
 import de.syntax.institut.projectweek.cocktailconnoisse.ui.viewmodel.DetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.KClass
+
+// TODO sts 31.05 - make all string localize
 
 object Details : AppRoute, AppRouteContent {
     override val route: String
@@ -73,6 +79,8 @@ object Details : AppRoute, AppRouteContent {
             viewModel?.let { viewModel ->
 
                 val viewModelState by viewModel.state.collectAsState()
+                val cocktail by viewModel.cocktail.collectAsState()
+                val cocktails by viewModel.cocktails.collectAsState()
                 val apiError by viewModel.repoError.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val id = navBackStackEntry?.arguments?.getString("id") ?: ""
@@ -86,7 +94,7 @@ object Details : AppRoute, AppRouteContent {
 
                 when (viewModelState) {
                     ViewModelState.READY -> {
-                        Content(viewModel)
+                        Details(cocktail, cocktails, navController)
                     }
 
                     ViewModelState.WORKING -> {
@@ -147,49 +155,104 @@ object Details : AppRoute, AppRouteContent {
 
 
     @Composable
-    private fun Content(
+    private fun Details(
 
-        viewModel: DetailsViewModel
+        cocktail: Cocktail?,
+        cocktails: List<Cocktail>,
+        navController: NavHostController,
     ) {
-
-        Details(viewModel)
-
-        Suggestions()
-    }
-
-
-    @Composable
-    fun Details(
-        viewModel: DetailsViewModel
-    ) {
-
-        val cocktail by viewModel.cocktail.collectAsState()
 
         Column(Modifier.fillMaxSize()) {
 
             cocktail?.let {
 
-                Text(
-                    text = it.name,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-
-                CostumAsyncImage(
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(350.dp),
-                    url = it.imageUrl
-                )
+                        .weight(1f)
+                        .padding(horizontal = 12.dp)
+                ) {
 
-                FavoriteSwitch(Modifier.padding(12.dp), it.id)
+                    item { CocktailItemDetail(it) }
+                    item { IngredientList(it.ingredients) }
+                    item { Instructions(it.instructions) }
+                    item { CocktailListByIngredient(it, cocktails, navController) }
+                }
             }
         }
+    }
 
+
+    @Composable
+    private fun IngredientList(
+
+        ingredients: List<Ingredient>
+    ) {
+
+
+        if (ingredients.isNotEmpty()) {
+
+            Column(
+                Modifier
+                    .fillMaxWidth()
+            ) {
+
+                Text(
+                    text = "Zutaten",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+
+                ingredients.forEach { ingredient ->
+
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 32.dp)
+                    ) {
+                        Text(
+                            text = ingredient.name ?: "Unbekannte Zutat",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        Spacer(Modifier.weight(1f))
+
+                        Text(
+                            text = ingredient.measure ?: "Unbekannte Zutat",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            }
+        }
     }
 
     @Composable
-    private fun Suggestions() {
+    private fun Instructions(instruction: String?) {
 
+        instruction?.let {
 
+            Column(
+                Modifier
+                    .fillMaxWidth()
+            ) {
+
+                Text(
+                    text = "Zubereitung",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
+
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp)
+                ) {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
     }
 }

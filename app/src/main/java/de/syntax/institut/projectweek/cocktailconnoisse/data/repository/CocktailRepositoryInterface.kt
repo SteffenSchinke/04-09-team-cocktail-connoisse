@@ -2,6 +2,7 @@ package de.syntax.institut.projectweek.cocktailconnoisse.data.repository
 
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Category
 import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Cocktail
+import de.syntax.institut.projectweek.cocktailconnoisse.data.model.Ingredient
 import de.syntax.institut.projectweek.cocktailconnoisse.enum.CocktailType
 import kotlinx.coroutines.flow.Flow
 
@@ -32,4 +33,6 @@ interface CocktailRepositoryInterface {
     fun getCocktails(name: String): Flow<List<Cocktail>>
 
     fun getCocktails(category: Category): Flow<List<Cocktail>>
+
+    fun getCocktails(ingredient: Ingredient, count: Int): Flow<List<Cocktail>>
 }
