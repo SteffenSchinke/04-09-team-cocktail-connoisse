@@ -66,6 +66,7 @@ class CategoriesViewModel(
 
     fun resetApiError() {
         _repoError.value = null
+        setState { ViewModelState.READY }
     }
 
     fun resetListForNavigationIds() {

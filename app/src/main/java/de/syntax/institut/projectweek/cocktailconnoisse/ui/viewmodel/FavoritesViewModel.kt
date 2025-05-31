@@ -55,5 +55,6 @@ class FavoritesViewModel(
 
     fun resetApiError() {
         _repoError.value = null
+        setState { ViewModelState.READY }
     }
 }

@@ -53,5 +53,8 @@ class CocktailsViewModel(
         }
     }
 
-    fun resetApiError() { _repoError.value = null }
+    fun resetApiError() {
+        _repoError.value = null
+        setState { ViewModelState.READY }
+    }
 }

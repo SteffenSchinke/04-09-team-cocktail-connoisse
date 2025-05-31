@@ -93,7 +93,10 @@ class HomeViewModel(
         loadCocktails()
     }
 
-    fun resetApiError() { _repoError.value = null }
+    fun resetApiError() {
+        _repoError.value = null
+        setState { ViewModelState.READY }
+    }
 
     fun searchCocktailsByName(name: String) {
         _searchJob?.cancel()
