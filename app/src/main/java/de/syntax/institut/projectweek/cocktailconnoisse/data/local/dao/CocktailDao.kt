@@ -24,7 +24,7 @@ interface CocktailDao {
 
     @Transaction
     @Query("SELECT * FROM cocktail where name = :name")
-    fun getCocktail(name: String): Flow<CocktailWithIngredients?>
+    fun getCocktailByName(name: String): Flow<CocktailWithIngredients?>
 
     @Transaction
     @Query("SELECT * FROM cocktail")
@@ -33,6 +33,10 @@ interface CocktailDao {
     @Transaction
     @Query("SELECT * FROM cocktail LIMIT :limit")
     fun getCocktails(limit: Int): Flow<List<CocktailWithIngredients>>
+
+    @Transaction
+    @Query("SELECT * FROM cocktail where category = :category")
+    fun getCocktailsByCategory(category: String): Flow<List<CocktailWithIngredients>>
 
     @Transaction
     @Query("SELECT * FROM cocktail WHERE favorited = 1")

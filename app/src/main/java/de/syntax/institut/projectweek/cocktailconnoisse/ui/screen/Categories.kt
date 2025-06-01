@@ -187,7 +187,7 @@ object Categories : AppRouteTab, AppRouteContent {
                         CategoryRow(chunk[0]) {
                             viewModel.onCategoryClick(it)
                         }
-                        CategoryRowTwice(chunk[0], chunk[1]) {
+                        CategoryRowTwice(chunk[1], chunk[2]) {
                             viewModel.onCategoryClick(it)
                         }
                     }
